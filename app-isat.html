@@ -1,0 +1,1172 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>ISAT · Top Energy</title>
+<style>
+:root{
+  --az:#1a5fa8;--az2:#0d3d6e;--verde:#2d6a2d;--amarillo:#8a5e00;--rojo:#8a1f1f;
+  --morado:#4a3580;--teal:#0a5c44;--naranja:#7a3c00;
+  --bg:#f5f6f8;--card:#fff;--border:#d0d4dc;--text:#1a1c20;--sub:#5a6070;
+  --t1-bg:#eeeefe;--t1-c:#3c3489;
+  --t2-bg:#e1f5ee;--t2-c:#085041;
+  --t3-bg:#faeeda;--t3-c:#633806;
+  --t4-bg:#faece7;--t4-c:#712b13;
+  --sel0-bg:#fcebeb;--sel0-c:#8a1f1f;--sel0-b:#e09090;
+  --sel1-bg:#faeeda;--sel1-c:#633806;--sel1-b:#d4a030;
+  --sel2-bg:#eaf3de;--sel2-c:#2d6a2d;--sel2-b:#70b040;
+  --sel3-bg:#eeedfe;--sel3-c:#3c3489;--sel3-b:#9090d8;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg);color:var(--text);font-size:15px;min-height:100vh;padding-bottom:80px}
+/* HEADER */
+.app-header{background:var(--az);color:#fff;padding:10px 14px 8px;position:sticky;top:0;z-index:100;box-shadow:0 2px 8px rgba(0,0,0,.2)}
+.app-header h1{font-size:15px;font-weight:600;letter-spacing:.3px}
+.app-header p{font-size:11px;opacity:.8;margin-top:1px}
+.header-row{display:flex;justify-content:space-between;align-items:flex-start}
+.score-pill{background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.35);border-radius:20px;padding:4px 12px;text-align:center;min-width:70px}
+.score-pill .num{font-size:20px;font-weight:700;line-height:1}
+.score-pill .lbl{font-size:9px;opacity:.85}
+/* NAV */
+.nav-tabs{display:flex;background:#fff;border-bottom:1px solid var(--border);position:sticky;top:52px;z-index:99;overflow-x:auto;-webkit-overflow-scrolling:touch}
+.nav-tab{flex:1;min-width:60px;padding:9px 4px;text-align:center;font-size:10px;color:var(--sub);cursor:pointer;border-bottom:2px solid transparent;white-space:nowrap}
+.nav-tab.active{color:var(--az);border-bottom-color:var(--az);font-weight:600}
+/* SECTIONS */
+.section{display:none;padding:10px 10px 0}
+.section.active{display:block}
+/* CARDS */
+.card{background:var(--card);border:1px solid var(--border);border-radius:12px;margin-bottom:10px;overflow:hidden}
+.card-hdr{padding:10px 12px;display:flex;align-items:center;gap:8px}
+.tier-badge{font-size:10px;font-weight:700;padding:3px 8px;border-radius:20px;white-space:nowrap}
+.t1-badge{background:var(--t1-bg);color:var(--t1-c)}
+.t2-badge{background:var(--t2-bg);color:var(--t2-c)}
+.t3-badge{background:var(--t3-bg);color:var(--t3-c)}
+.t4-badge{background:var(--t4-bg);color:var(--t4-c)}
+.card-title{font-size:13px;font-weight:600;flex:1}
+.card-pts{font-size:11px;color:var(--sub)}
+/* ITEMS */
+.item{padding:10px 12px;border-top:1px solid var(--border)}
+.item-name{font-size:13px;font-weight:500;margin-bottom:2px}
+.item-sub{font-size:11px;color:var(--sub);margin-bottom:8px;line-height:1.4}
+.scoring{display:flex;gap:5px;align-items:center}
+.sc-btn{flex:1;height:38px;border-radius:8px;border:1.5px solid var(--border);font-size:13px;font-weight:700;cursor:pointer;background:var(--bg);color:var(--sub);transition:all .12s;-webkit-appearance:none}
+.sc-btn:active{transform:scale(.94)}
+.sc-btn.s0.sel{background:var(--sel0-bg);border-color:var(--sel0-b);color:var(--sel0-c)}
+.sc-btn.s1.sel{background:var(--sel1-bg);border-color:var(--sel1-b);color:var(--sel1-c)}
+.sc-btn.s2.sel{background:var(--sel2-bg);border-color:var(--sel2-b);color:var(--sel2-c)}
+.sc-btn.s3.sel{background:var(--sel3-bg);border-color:var(--sel3-b);color:var(--sel3-c)}
+.sc-na{width:40px;height:38px;border-radius:8px;border:1.5px dashed var(--border);font-size:9px;font-weight:600;cursor:pointer;background:var(--bg);color:var(--sub);-webkit-appearance:none}
+.sc-na.sel{background:#f0f0f0;border-color:#999;color:#555}
+/* META FORM */
+.meta-form{padding:10px}
+.meta-row{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px}
+.meta-row.full{grid-template-columns:1fr}
+.meta-field label{font-size:11px;color:var(--sub);display:block;margin-bottom:3px;font-weight:500}
+.meta-field input,.meta-field select,.meta-field textarea{width:100%;padding:9px 10px;border:1.5px solid var(--border);border-radius:8px;font-size:14px;color:var(--text);background:var(--card);-webkit-appearance:none;appearance:none}
+.meta-field select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath d='M2 4l4 4 4-4' stroke='%235a6070' stroke-width='1.5' fill='none'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center;padding-right:28px}
+/* BANOS */
+.bano-item{padding:9px 12px;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;gap:8px}
+.bano-lbl{font-size:12px;flex:1;line-height:1.3}
+.bano-btns{display:flex;gap:5px}
+.bano-btn{width:38px;height:34px;border-radius:8px;border:1.5px solid var(--border);font-size:12px;font-weight:700;cursor:pointer;background:var(--bg);color:var(--sub);-webkit-appearance:none}
+.bano-btn:active{transform:scale(.92)}
+.bano-btn.ok{background:var(--sel2-bg);border-color:var(--sel2-b);color:var(--sel2-c)}
+.bano-btn.fail{background:var(--sel0-bg);border-color:var(--sel0-b);color:var(--sel0-c)}
+.bano-btn.na{font-size:9px;border-style:dashed}
+.bano-btn.na.sel{background:#f0f0f0;border-color:#999;color:#555}
+/* LEGEND */
+.legend{display:flex;flex-wrap:wrap;gap:6px;padding:10px 10px 4px}
+.leg{display:flex;align-items:center;gap:4px;font-size:10px;color:var(--sub)}
+.leg-box{width:18px;height:18px;border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700}
+/* RESULT */
+.result-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px;margin-bottom:10px}
+.result-title{font-size:13px;font-weight:600;color:var(--sub);margin-bottom:10px;text-transform:uppercase;letter-spacing:.5px}
+.tier-scores{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px}
+.tier-sc{border-radius:8px;padding:10px;text-align:center}
+.tier-sc .n{font-size:22px;font-weight:700}
+.tier-sc .l{font-size:10px;margin-top:2px}
+.isat-total{text-align:center;padding:14px;border-radius:12px;margin-bottom:10px}
+.isat-total .big{font-size:48px;font-weight:700;line-height:1}
+.isat-total .lbl{font-size:13px;margin-top:4px}
+.nivel-tag{display:inline-block;padding:6px 16px;border-radius:20px;font-size:13px;font-weight:600;margin-top:6px}
+.nota-box{padding:10px 12px;border-radius:8px;font-size:12px;line-height:1.5;margin-bottom:10px}
+/* HEYCYAN SECTION */
+.protocol-step{display:flex;gap:10px;padding:10px 12px;border-top:1px solid var(--border);align-items:flex-start}
+.step-num{width:26px;height:26px;border-radius:50%;background:var(--az);color:#fff;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}
+.step-body{flex:1}
+.step-title{font-size:13px;font-weight:600;margin-bottom:2px}
+.step-desc{font-size:11px;color:var(--sub);line-height:1.5}
+.step-code{font-size:11px;font-family:monospace;background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:4px 8px;margin-top:4px;word-break:break-all}
+.folder-tree{font-size:12px;font-family:monospace;background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:10px 12px;margin:8px 12px;line-height:1.8;color:var(--text)}
+/* BOTTOM BAR */
+.bottom-bar{position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1px solid var(--border);display:flex;gap:8px;padding:8px 10px;z-index:200;padding-bottom:max(8px, env(safe-area-inset-bottom))}
+.btn-main{flex:1;padding:12px;border-radius:10px;border:none;font-size:13px;font-weight:600;cursor:pointer;-webkit-appearance:none}
+.btn-save{background:var(--az);color:#fff}
+.btn-export{background:#fff;color:var(--az);border:1.5px solid var(--az)}
+.btn-main:active{opacity:.8;transform:scale(.97)}
+/* OBSERVATIONS */
+.obs-area{margin:8px 12px 10px;padding:8px 10px;border:1.5px solid var(--border);border-radius:8px;font-size:13px;width:calc(100% - 24px);min-height:60px;resize:none;color:var(--text);background:var(--card)}
+/* PHOTO REFERENCE */
+.photo-ref{display:flex;align-items:center;gap:8px;padding:8px 12px;background:#f0f4ff;border-top:1px solid #c0ccee;font-size:11px;color:#3a4a80}
+.photo-icon{font-size:16px}
+/* TOASTS */
+.toast{position:fixed;top:70px;left:50%;transform:translateX(-50%) translateY(-20px);background:#222;color:#fff;padding:8px 18px;border-radius:20px;font-size:13px;z-index:999;opacity:0;transition:all .3s;pointer-events:none;white-space:nowrap}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+/* VISITS LIST */
+.visit-item{padding:10px 12px;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center}
+.visit-name{font-size:13px;font-weight:500}
+.visit-meta{font-size:11px;color:var(--sub)}
+.visit-score{font-size:15px;font-weight:700;padding:4px 10px;border-radius:20px}
+.del-btn{padding:5px 10px;border-radius:6px;border:1px solid #e0c0c0;background:#fff8f8;color:#a03030;font-size:11px;cursor:pointer}
+</style>
+</head>
+<body>
+
+<div class="app-header">
+  <div class="header-row">
+    <div>
+      <h1>ISAT · Top Energy SLP</h1>
+      <p id="hdr-sub">Índice de Servicios y Atractivos de Tráfico</p>
+    </div>
+    <div class="score-pill">
+      <div class="num" id="hdr-score">—</div>
+      <div class="lbl">ISAT</div>
+    </div>
+  </div>
+</div>
+
+<div class="nav-tabs" id="nav">
+  <div class="nav-tab active" onclick="goTab(0)">Datos</div>
+  <div class="nav-tab" onclick="goTab(1)">T1 Imanes</div>
+  <div class="nav-tab" onclick="goTab(2)">T2 Paso</div>
+  <div class="nav-tab" onclick="goTab(3)">Baños</div>
+  <div class="nav-tab" onclick="goTab(4)">T3 Vehículo</div>
+  <div class="nav-tab" onclick="goTab(5)">T4 Confianza</div>
+  <div class="nav-tab" onclick="goTab(6)">Resultado</div>
+  <div class="nav-tab" onclick="goTab(7)">HeyCyan</div>
+  <div class="nav-tab" onclick="goTab(8)">Historial</div>
+  <div class="nav-tab" onclick="goTab(9)">📲 Instalar</div>
+</div>
+
+<!-- TAB 0: DATOS GENERALES -->
+<div class="section active" id="tab0">
+  <div class="meta-form">
+    <div class="meta-row">
+      <div class="meta-field">
+        <label>Clave estación</label>
+        <select id="d-clave">
+          <option value="">— Seleccionar —</option>
+          <optgroup label="Top Energy">
+          <option value="TE-01">TE-01 — Alamitos</option>
+          <option value="TE-02">TE-02 — B. Anaya</option>
+          <option value="TE-03">TE-03 — Central</option>
+          <option value="TE-04">TE-04 — Chapultepec</option>
+          <option value="TE-05">TE-05 — Ducati</option>
+          <option value="TE-06">TE-06 — Glorieta</option>
+          <option value="TE-07">TE-07 — Himno</option>
+          <option value="TE-08">TE-08 — La Feria</option>
+          <option value="TE-09">TE-09 — Las Lomas</option>
+          <option value="TE-10">TE-10 — Los Globos</option>
+          <option value="TE-11">TE-11 — Morales</option>
+          <option value="TE-12">TE-12 — Polanco</option>
+          <option value="TE-13">TE-13 — Pozos A</option>
+          <option value="TE-14">TE-14 — Pozos B</option>
+          <option value="TE-15">TE-15 — Reforma</option>
+          <option value="TE-16">TE-16 — Salk 1</option>
+          <option value="TE-17">TE-17 — Salk 2</option>
+          <option value="TE-18">TE-18 — Satélite</option>
+          <option value="TE-19">TE-19 — Soledad 1</option>
+          <option value="TE-20">TE-20 — Soledad 2</option>
+          <option value="TE-21">TE-21 — Villa Magna</option>
+          </optgroup>
+          <optgroup label="Competidor A">
+          <option value="CA-01">CA-01 — Gazpro (Alamitos)</option>
+          <option value="CA-02">CA-02 — Svc. Abastos (B. Anaya)</option>
+          <option value="CA-03">CA-03 — Hidrosina Plus (Central)</option>
+          <option value="CA-04">CA-04 — Corpoe Mobil Lomas</option>
+          <option value="CA-05">CA-05 — Corpoe Mobil (Ducati)</option>
+          <option value="CA-06">CA-06 — Svc. Relámpago Gasomax</option>
+          <option value="CA-07">CA-07 — Svc. Tatanacho (Himno)</option>
+          <option value="CA-08">CA-08 — Gasolineras Asoc. Potosinas</option>
+          <option value="CA-09">CA-09 — Ultra Svc. Lomas</option>
+          <option value="CA-10">CA-10 — Svc. Acceso Norte</option>
+          <option value="CA-11">CA-11 — Corpoe Mobil (Morales)</option>
+          <option value="CA-12">CA-12 — Corpoe Mobil (Polanco)</option>
+          <option value="CA-13">CA-13 — Comserpo (Pozos A)</option>
+          <option value="CA-14">CA-14 — Comserpo (Pozos B)</option>
+          <option value="CA-15">CA-15 — Gazpro (Reforma)</option>
+          <option value="CA-16">CA-16 — Futurgas (Salk 1)</option>
+          <option value="CA-17">CA-17 — Gasolinera Perisur (Salk 2)</option>
+          <option value="CA-18">CA-18 — Svc. Fonseca (Satélite)</option>
+          <option value="CA-19">CA-19 — Ag. Comb. El Morro</option>
+          <option value="CA-20">CA-20 — Suana (Soledad 2)</option>
+          <option value="CA-21">CA-21 — Corpoe Mobil (V. Magna)</option>
+          </optgroup>
+          <optgroup label="Competidor B">
+          <option value="CB-01">CB-01 — Svc. Tatanacho (Alamitos)</option>
+          <option value="CB-02">CB-02 — Gazpro Mobil (B. Anaya)</option>
+          <option value="CB-03">CB-03 — Svc. Esmeralda (Central)</option>
+          <option value="CB-04">CB-04 — Costco Gas</option>
+          <option value="CB-05">CB-05 — Svc. Tenoch Gasomax (Ducati)</option>
+          <option value="CB-06">CB-06 — Svc. Valentín Amador Gulf</option>
+          <option value="CB-07">CB-07 — Svc. Clouthier Mobil</option>
+          <option value="CB-08">CB-08 — Gasolinera Perisur (La Feria)</option>
+          <option value="CB-09">CB-09 — Svc. Sierra Vista Gasolider</option>
+          <option value="CB-10">CB-10 — Gazpro Mobil (Globos)</option>
+          <option value="CB-11">CB-11 — Súper Est. Alba Mobil</option>
+          <option value="CB-12">CB-12 — Gasolinera Dorado Gasomax</option>
+          <option value="CB-13">CB-13 — Multisvc. Tula 2000 A</option>
+          <option value="CB-14">CB-14 — Multisvc. Tula 2000 B</option>
+          <option value="CB-15">CB-15 — Ultra Svc. Alameda Mobil</option>
+          <option value="CB-16">CB-16 — Hidrosina Plus (Salk 1)</option>
+          <option value="CB-17">CB-17 — Express Gas Gasomax</option>
+          <option value="CB-18">CB-18 — Op. Franquicias Dineé</option>
+          <option value="CB-19">CB-19 — Express Perico</option>
+          <option value="CB-20">CB-20 — Gaso Prod. Periférico Ote.</option>
+          <option value="CB-21">CB-21 — Svc. Tenoch Gasomax (VM)</option>
+          </optgroup>
+        </select>
+      </div>
+      <div class="meta-field">
+        <label>Grupo / Marca</label>
+        <select id="d-grupo">
+          <option value="">— Seleccionar —</option>
+          <option>Top Energy</option><option>Gaspeed</option><option>Top Fuel</option>
+          <option>Gasomax</option><option>Gasolider</option><option>Mobil</option>
+          <option>Avicen / Urbanus</option><option>Otro</option>
+        </select>
+      </div>
+    </div>
+    <div class="meta-row full">
+      <div class="meta-field">
+        <label>Nombre / dirección de estación</label>
+        <input type="text" id="d-nombre" placeholder="Ej. Top Energy Satélite · Av. Himno 1200">
+      </div>
+    </div>
+    <div class="meta-row">
+      <div class="meta-field">
+        <label>Evaluador</label>
+        <select id="d-eval">
+          <option value="">— Seleccionar —</option>
+          <option>JFG — Coordinador</option>
+          <option>Evaluador A</option>
+          <option>Evaluador B</option>
+        </select>
+      </div>
+      <div class="meta-field">
+        <label>Turno</label>
+        <select id="d-turno">
+          <option>Mañana (06–12h)</option>
+          <option>Tarde (12–18h)</option>
+          <option>Noche (18–22h)</option>
+        </select>
+      </div>
+    </div>
+    <div class="meta-row">
+      <div class="meta-field">
+        <label>Fecha</label>
+        <input type="date" id="d-fecha">
+      </div>
+      <div class="meta-field">
+        <label>Hora inicio</label>
+        <input type="time" id="d-hora">
+      </div>
+    </div>
+    <div class="meta-row full">
+      <div class="meta-field">
+        <label>Código de carpeta HeyCyan</label>
+        <input type="text" id="d-video" placeholder="Ej: TE-01_20260621_M" oninput="updateVideoPreview(this.value)" autocomplete="off" autocorrect="off" spellcheck="false">
+      </div>
+    </div>
+
+    <div id="heycyan-guide" style="margin:10px 12px 4px;border:1.5px solid #1a5fa8;border-radius:12px;overflow:hidden">
+      <div style="background:#1a5fa8;padding:8px 12px;display:flex;align-items:center;gap:8px;cursor:pointer" onclick="toggleHCGuide()">
+        <span style="font-size:15px">&#x1F97D;</span>
+        <span style="font-size:12px;font-weight:600;color:#fff;flex:1">&#x00BF;Que anoto aqui? Flujo HeyCyan paso a paso</span>
+        <span style="font-size:11px;color:rgba(255,255,255,.75)" id="hc-toggle-lbl">&#x25BC; ver</span>
+      </div>
+      <div id="hc-guide-body" style="display:none">
+        <div style="background:#eef4ff;padding:10px 12px;border-bottom:1px solid #c0ccee">
+          <div style="font-size:11px;font-weight:600;color:#0d3d6e;margin-bottom:4px">Que escribo en este campo</div>
+          <div style="font-size:12px;color:#1a1c20;line-height:1.5">Solo el <strong>nombre de la carpeta</strong> que creaste en HeyCyan antes de entrar. No es un video ni un link: es el nombre exacto de la carpeta donde quedan todos los clips y fotos de esa visita.</div>
+        </div>
+        <div style="background:#f8faff;padding:10px 12px;border-bottom:1px solid #d0d8ee">
+          <div style="font-size:11px;font-weight:600;color:#0d3d6e;margin-bottom:8px">Constructor del codigo — toca cada bloque para saber que significa</div>
+          <div style="display:flex;gap:6px;align-items:stretch;margin-bottom:8px">
+            <div style="flex:1;background:#fff;border:1.5px solid #1a5fa8;border-radius:8px;padding:7px 6px;text-align:center;cursor:pointer" onclick="showHCHelp('clave')">
+              <div style="font-size:16px;font-weight:700;color:#1a5fa8;font-family:monospace" id="hc-b-clave">TE-01</div>
+              <div style="font-size:9px;color:#5a6070;margin-top:2px">CLAVE</div>
+            </div>
+            <div style="display:flex;align-items:center;font-size:18px;color:#888">_</div>
+            <div style="flex:1.3;background:#fff;border:1.5px solid #0a5c44;border-radius:8px;padding:7px 6px;text-align:center;cursor:pointer" onclick="showHCHelp('fecha')">
+              <div style="font-size:12px;font-weight:700;color:#0a5c44;font-family:monospace" id="hc-b-fecha">20260621</div>
+              <div style="font-size:9px;color:#5a6070;margin-top:2px">FECHA AAAAMMDD</div>
+            </div>
+            <div style="display:flex;align-items:center;font-size:18px;color:#888">_</div>
+            <div style="flex:0.7;background:#fff;border:1.5px solid #633806;border-radius:8px;padding:7px 6px;text-align:center;cursor:pointer" onclick="showHCHelp('turno')">
+              <div style="font-size:18px;font-weight:700;color:#633806;font-family:monospace" id="hc-b-turno">M</div>
+              <div style="font-size:9px;color:#5a6070;margin-top:2px">TURNO</div>
+            </div>
+          </div>
+          <div id="hc-help-box" style="display:none;padding:8px 10px;border-radius:8px;font-size:11px;line-height:1.5;margin-bottom:6px"></div>
+          <div style="background:#0d3d6e;border-radius:8px;padding:8px 12px;display:flex;align-items:center;justify-content:space-between">
+            <div>
+              <div style="font-size:9px;color:rgba(255,255,255,.6);margin-bottom:2px">Nombre de carpeta en HeyCyan:</div>
+              <div style="font-size:14px;font-weight:700;color:#fff;font-family:monospace;letter-spacing:.5px" id="hc-preview-code">TE-01_20260621_M</div>
+            </div>
+            <button onclick="usarCodigo()" style="background:#fff;color:#0d3d6e;border:none;border-radius:8px;padding:6px 12px;font-size:11px;font-weight:700;cursor:pointer">Copiar al campo</button>
+          </div>
+        </div>
+        <div style="padding:10px 12px;border-bottom:1px solid #d0d8ee">
+          <div style="font-size:11px;font-weight:600;color:#0d3d6e;margin-bottom:8px">Flujo completo: cuando haces cada cosa</div>
+          <div style="display:flex;gap:8px;margin-bottom:10px;align-items:flex-start">
+            <div style="width:22px;height:22px;min-width:22px;border-radius:50%;background:#1a5fa8;color:#fff;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center">1</div>
+            <div style="flex:1">
+              <div style="font-size:11px;font-weight:600;color:#1a1c20">Antes de entrar a la estacion</div>
+              <div style="font-size:10px;color:#5a6070;line-height:1.4;margin-top:2px">Abre HeyCyan > Album > Nueva carpeta > escribe el nombre exacto</div>
+              <div style="font-family:monospace;font-size:11px;background:#f0f4ff;border:1px solid #b0c0e0;border-radius:6px;padding:4px 8px;margin-top:4px;color:#0d3d6e">TE-01_20260621_M</div>
+            </div>
+          </div>
+          <div style="display:flex;gap:8px;margin-bottom:10px;align-items:flex-start">
+            <div style="width:22px;height:22px;min-width:22px;border-radius:50%;background:#0a5c44;color:#fff;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center">2</div>
+            <div style="flex:1">
+              <div style="font-size:11px;font-weight:600;color:#1a1c20">Durante la visita</div>
+              <div style="font-size:10px;color:#5a6070;line-height:1.4;margin-top:2px">Los lentes graban pasivamente. Al salir del auto activas clips cortos por items con falla (S06, B04...) verbalizando la clave en voz baja.</div>
+            </div>
+          </div>
+          <div style="display:flex;gap:8px;margin-bottom:10px;align-items:flex-start">
+            <div style="width:22px;height:22px;min-width:22px;border-radius:50%;background:#633806;color:#fff;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center">3</div>
+            <div style="flex:1">
+              <div style="font-size:11px;font-weight:600;color:#1a1c20">Al salir (en el auto, 200 m de distancia)</div>
+              <div style="font-size:10px;color:#5a6070;line-height:1.4;margin-top:2px">En HeyCyan mueve todos los clips a la carpeta del paso 1. Agrega nota de texto con el score:</div>
+              <div style="font-family:monospace;font-size:10px;background:#faeeda;border:1px solid #d4a030;border-radius:6px;padding:4px 8px;margin-top:4px;color:#633806">ISAT:74 T1:82 T2:68 T3:71 T4:65 | JFG M</div>
+            </div>
+          </div>
+          <div style="display:flex;gap:8px;align-items:flex-start">
+            <div style="width:22px;height:22px;min-width:22px;border-radius:50%;background:#2d3a8a;color:#fff;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center">4</div>
+            <div style="flex:1">
+              <div style="font-size:11px;font-weight:600;color:#1a1c20">Aqui en la app, este campo</div>
+              <div style="font-size:10px;color:#5a6070;line-height:1.4;margin-top:2px">Escribe el mismo nombre del paso 1. El Integrador Excel lo cruza con tu score ISAT para que cualquiera sepa donde esta la evidencia.</div>
+              <div style="font-family:monospace;font-size:11px;background:#eaf3de;border:1px solid #70b040;border-radius:6px;padding:4px 8px;margin-top:4px;color:#2d6a2d">TE-01_20260621_M  &lt;-- esto escribes aqui</div>
+            </div>
+          </div>
+        </div>
+        <div style="padding:8px 12px">
+          <div style="font-size:10px;font-weight:600;color:#0d3d6e;margin-bottom:6px">Letras de turno</div>
+          <div style="display:flex;gap:6px">
+            <div style="flex:1;background:#eef4ff;border:1px solid #b0c0e0;border-radius:8px;padding:6px;text-align:center">
+              <div style="font-size:20px;font-weight:700;color:#1a5fa8;font-family:monospace">M</div>
+              <div style="font-size:9px;color:#5a6070">Manana 07-12h</div>
+            </div>
+            <div style="flex:1;background:#faeeda;border:1px solid #d4a030;border-radius:8px;padding:6px;text-align:center">
+              <div style="font-size:20px;font-weight:700;color:#633806;font-family:monospace">T</div>
+              <div style="font-size:9px;color:#5a6070">Tarde 12-18h</div>
+            </div>
+            <div style="flex:1;background:#1a1a2e;border:1px solid #444;border-radius:8px;padding:6px;text-align:center">
+              <div style="font-size:20px;font-weight:700;color:#fff;font-family:monospace">N</div>
+              <div style="font-size:9px;color:#aaa">Noche 18-22h</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="meta-row full">
+      <div class="meta-field">
+        <label>Observaciones generales de la estación</label>
+        <textarea id="d-obs" rows="3" placeholder="Condiciones del lugar, afluencia, clima, incidentes..."></textarea>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- TAB 1: T1 IMANES -->
+<div class="section" id="tab1">
+  <div class="legend">
+    <span class="leg"><span class="leg-box" style="background:var(--sel0-bg);color:var(--sel0-c);border:1px solid var(--sel0-b)">0</span>No existe</span>
+    <span class="leg"><span class="leg-box" style="background:var(--sel1-bg);color:var(--sel1-c);border:1px solid var(--sel1-b)">1</span>Fallas graves</span>
+    <span class="leg"><span class="leg-box" style="background:var(--sel2-bg);color:var(--sel2-c);border:1px solid var(--sel2-b)">2</span>Aceptable</span>
+    <span class="leg"><span class="leg-box" style="background:var(--sel3-bg);color:var(--sel3-c);border:1px solid var(--sel3-b)">3</span>Excelente</span>
+  </div>
+  <div class="card">
+    <div class="card-hdr">
+      <span class="tier-badge t1-badge">T1 · 35%</span>
+      <span class="card-title">Imanes de destino</span>
+      <span class="card-pts" id="pts-T1">0 pts</span>
+    </div>
+    <div id="items-T1"></div>
+    <div class="photo-ref"><span class="photo-icon">📸</span><span>Fotografía: fachada de tienda / franquicia / cajero — nombrar <b>G##-S0#-frente.jpg</b></span></div>
+    <textarea class="obs-area" placeholder="Observaciones Tier 1…" id="obs-T1"></textarea>
+  </div>
+</div>
+
+<!-- TAB 2: T2 PASO -->
+<div class="section" id="tab2">
+  <div class="legend">
+    <span class="leg"><span class="leg-box" style="background:var(--sel0-bg);color:var(--sel0-c);border:1px solid var(--sel0-b)">0</span>No existe</span>
+    <span class="leg"><span class="leg-box" style="background:var(--sel1-bg);color:var(--sel1-c);border:1px solid var(--sel1-b)">1</span>Fallas</span>
+    <span class="leg"><span class="leg-box" style="background:var(--sel2-bg);color:var(--sel2-c);border:1px solid var(--sel2-b)">2</span>OK</span>
+    <span class="leg"><span class="leg-box" style="background:var(--sel3-bg);color:var(--sel3-c);border:1px solid var(--sel3-b)">3</span>Excelente</span>
+  </div>
+  <div class="card">
+    <div class="card-hdr">
+      <span class="tier-badge t2-badge">T2 · 30%</span>
+      <span class="card-title">Captación de paso</span>
+      <span class="card-pts" id="pts-T2">0 pts</span>
+    </div>
+    <div id="items-T2"></div>
+    <div class="photo-ref"><span class="photo-icon">📸</span><span>Fotografía: entrada a car wash, área de espera, display de precios — <b>G##-S0#-detalle.jpg</b></span></div>
+    <textarea class="obs-area" placeholder="Observaciones Tier 2…" id="obs-T2"></textarea>
+  </div>
+</div>
+
+<!-- TAB 3: BAÑOS -->
+<div class="section" id="tab3">
+  <div class="card">
+    <div class="card-hdr">
+      <span class="tier-badge t2-badge">Auditoría · Baños</span>
+      <span class="card-title">13 ítems — vinculado a S07</span>
+      <span class="card-pts" id="pts-banos">0/13</span>
+    </div>
+    <div id="items-banos"></div>
+    <div class="photo-ref"><span class="photo-icon">📸</span><span>Fotografía: interior de baño (2 tomas) — <b>G##-B01-interior.jpg / G##-B01-acceso.jpg</b></span></div>
+    <textarea class="obs-area" placeholder="Observaciones de baños: cobro, olor, estado general…" id="obs-banos"></textarea>
+  </div>
+  <div class="card" style="padding:10px 12px;font-size:11px;color:var(--sub);line-height:1.6">
+    <b>Cálculo automático S07:</b> ≥85% ítems OK → 3 · 65–84% → 2 · 40–64% → 1 · &lt;40% → 0. El score de baños actualiza S07 en T2 automáticamente.
+  </div>
+</div>
+
+<!-- TAB 4: T3 VEHICULO -->
+<div class="section" id="tab4">
+  <div class="card">
+    <div class="card-hdr">
+      <span class="tier-badge t3-badge">T3 · 20%</span>
+      <span class="card-title">Servicios al vehículo</span>
+      <span class="card-pts" id="pts-T3">0 pts</span>
+    </div>
+    <div id="items-T3"></div>
+    <div class="photo-ref"><span class="photo-icon">📸</span><span>Fotografía: exhibidor de aceites, bahía de cambio, vulcanizadora — <b>G##-S1#-servicio.jpg</b></span></div>
+    <textarea class="obs-area" placeholder="Observaciones Tier 3…" id="obs-T3"></textarea>
+  </div>
+</div>
+
+<!-- TAB 5: T4 CONFIANZA -->
+<div class="section" id="tab5">
+  <div class="card">
+    <div class="card-hdr">
+      <span class="tier-badge t4-badge">T4 · 15%</span>
+      <span class="card-title">Habilitadores de confianza</span>
+      <span class="card-pts" id="pts-T4">0 pts</span>
+    </div>
+    <div id="items-T4"></div>
+    <div class="photo-ref"><span class="photo-icon">📸</span><span>Fotografía: terminal de pago, QR facturación, CCTV visible — <b>G##-S1#-confianza.jpg</b></span></div>
+    <textarea class="obs-area" placeholder="Observaciones Tier 4…" id="obs-T4"></textarea>
+  </div>
+</div>
+
+<!-- TAB 6: RESULTADO -->
+<div class="section" id="tab6">
+  <div class="isat-total" id="result-total-box" style="background:#f0f4ff;border:1px solid #b0c0e0">
+    <div class="big" id="r-big">—</div>
+    <div class="lbl">ISAT / 100</div>
+    <div class="nivel-tag" id="r-nivel">—</div>
+  </div>
+  <div class="result-card">
+    <div class="result-title">Score por tier</div>
+    <div class="tier-scores">
+      <div class="tier-sc" style="background:var(--t1-bg)"><div class="n" style="color:var(--t1-c)" id="r-t1">—</div><div class="l" style="color:var(--t1-c)">T1 Imanes (35%)</div></div>
+      <div class="tier-sc" style="background:var(--t2-bg)"><div class="n" style="color:var(--t2-c)" id="r-t2">—</div><div class="l" style="color:var(--t2-c)">T2 Paso (30%)</div></div>
+      <div class="tier-sc" style="background:var(--t3-bg)"><div class="n" style="color:var(--t3-c)" id="r-t3">—</div><div class="l" style="color:var(--t3-c)">T3 Vehículo (20%)</div></div>
+      <div class="tier-sc" style="background:var(--t4-bg)"><div class="n" style="color:var(--t4-c)" id="r-t4">—</div><div class="l" style="color:var(--t4-c)">T4 Confianza (15%)</div></div>
+    </div>
+  </div>
+  <div class="nota-box" id="r-nota" style="background:#f0f0f0;color:#444;font-size:12px;line-height:1.5">Presiona "Guardar registro" para calcular el resultado final.</div>
+  <div class="result-card" style="font-size:11px;color:var(--sub);line-height:1.7">
+    <b>Hipótesis central:</b> A mayor ISAT, mayor generación de tráfico independiente del precio. Contrastar con litros libres mensuales de la estación en el Unificador.
+  </div>
+</div>
+
+<!-- TAB 7: HEYCYAN -->
+<div class="section" id="tab7">
+  <div class="card">
+    <div class="card-hdr" style="background:#1a1a2e;border-radius:12px 12px 0 0">
+      <span style="font-size:16px">👓</span>
+      <span class="card-title" style="color:#fff">Protocolo HeyCyan — Lentes con cámara</span>
+    </div>
+
+    <div class="protocol-step">
+      <div class="step-num">1</div>
+      <div class="step-body">
+        <div class="step-title">Antes de entrar a la estación</div>
+        <div class="step-desc">Activa HeyCyan en modo "Grabación continua silenciosa". Verifica que el ícono de almacenamiento muestre al menos 2 GB libres. Activa la vista de tiempo en pantalla de los lentes.</div>
+        <div class="step-code">📁 Álbum HeyCyan → Crear carpeta:<br>ISAT_[CLAVE]_[YYYYMMDD]_[T/M/N]<br>Ej: ISAT_G01-TE_20260621_M</div>
+      </div>
+    </div>
+
+    <div class="protocol-step">
+      <div class="step-num">2</div>
+      <div class="step-body">
+        <div class="step-title">Recorrido de inspección visual (5–8 min)</div>
+        <div class="step-desc">Camina el perímetro completo de la estación siguiendo esta secuencia fija para que los clips sean consistentes en todas las 63 visitas:</div>
+        <div class="step-code">
+          A → Acceso vehicular y señalización exterior<br>
+          B → Patio / islas de despacho (panorámica)<br>
+          C → Tienda / franquicia / cajero ATM<br>
+          D → Car wash (entrada + interior si accesible)<br>
+          E → Baños (acceso, señalización, interior)<br>
+          F → Vulcanizadora / servicios al vehículo<br>
+          G → Área de descanso / pensión (si existe)<br>
+          H → Salida y señalización de calle
+        </div>
+      </div>
+    </div>
+
+    <div class="protocol-step">
+      <div class="step-num">3</div>
+      <div class="step-body">
+        <div class="step-title">Clips de evidencia dirigida (mientras llenas el ISAT)</div>
+        <div class="step-desc">Para cada ítem que marques 0 o 1, activa una grabación corta (15–30 seg) enfocando exactamente el problema. Verbaliza en voz baja la clave del ítem.</div>
+        <div class="step-code">Ejemplo: "S06 car wash — cerrado, sin señalización de precios"<br>Ejemplo: "B04 piso mojado con charco de entrada"</div>
+      </div>
+    </div>
+
+    <div class="protocol-step">
+      <div class="step-num">4</div>
+      <div class="step-body">
+        <div class="step-title">Al salir — etiquetar en HeyCyan</div>
+        <div class="step-desc">En la app HeyCyan, selecciona todos los clips de la sesión y muévelos a la carpeta creada en el paso 1. Añade nota de texto en la app:</div>
+        <div class="step-code">ISAT: [score] | T1:[x] T2:[x] T3:[x] T4:[x]<br>Evaluador: [iniciales] | Turno: [M/T/N]</div>
+      </div>
+    </div>
+
+    <div class="protocol-step">
+      <div class="step-num">5</div>
+      <div class="step-body">
+        <div class="step-title">Descarga diaria a PC (al terminar jornada)</div>
+        <div class="step-desc">Conecta los lentes por USB o usa la sincronización WiFi de HeyCyan. En PC, copia la carpeta del día a la estructura de archivos del proyecto:</div>
+        <div class="folder-tree">
+📁 TopEnergy_ISAT_2026/<br>
+├── 📁 Semana_1/<br>
+│   ├── 📁 ISAT_G01-TE_20260621_M/<br>
+│   │   ├── 🎬 A_acceso.mp4<br>
+│   │   ├── 🎬 B_patio.mp4<br>
+│   │   ├── 🎬 C_tienda.mp4<br>
+│   │   ├── 🎬 D_carwash.mp4<br>
+│   │   ├── 🎬 E_banos.mp4<br>
+│   │   ├── 🎬 F_vehiculo.mp4<br>
+│   │   ├── 🎬 evidencia_S06.mp4<br>
+│   │   └── 📄 ISAT_G01-TE_20260621.csv<br>
+│   └── 📁 ISAT_G01-CA_20260621_M/<br>
+└── 📁 Semana_2/
+        </div>
+      </div>
+    </div>
+
+    <div class="protocol-step">
+      <div class="step-num">6</div>
+      <div class="step-body">
+        <div class="step-title">Nomenclatura de clips y fotos</div>
+        <div class="step-desc">Toda evidencia debe seguir esta convención para que el Unificador Excel pueda hacer referencia cruzada automática:</div>
+        <div class="step-code">
+          Clips: [CLAVE]-[ZONA]-[DESCRIPCION].mp4<br>
+          Ej: G01-TE-E_banos_sin_papel.mp4<br><br>
+          Fotos SmartGlasses: [CLAVE]-[ITEM]-[SEQ].jpg<br>
+          Ej: G01-TE-S06-01.jpg<br><br>
+          Fotos GoPro: [CLAVE]-GOPRO-[SEQ].jpg<br>
+          Ej: G01-TE-GOPRO-001.jpg
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- TAB 8: HISTORIAL -->
+<div class="section" id="tab8">
+  <div class="card">
+    <div class="card-hdr">
+      <span class="card-title">Registros guardados en este dispositivo</span>
+      <span class="card-pts" id="hist-count">0 visitas</span>
+    </div>
+    <div id="hist-list"><div style="padding:16px;font-size:13px;color:var(--sub);text-align:center">Sin registros aún</div></div>
+  </div>
+  <div style="padding:0 10px 10px">
+    <button class="btn-main btn-export" style="width:100%;margin-bottom:8px" onclick="exportCSV()">⬇ Exportar TODO a CSV</button>
+    <button class="btn-main" style="width:100%;background:#fff;color:#a03030;border:1.5px solid #e0c0c0;font-size:12px" onclick="clearAll()">Limpiar todos los registros</button>
+  </div>
+</div>
+
+
+<!-- TAB 9: INSTALAR COMO APP -->
+<div class="section" id="tab9">
+  <div style="padding:10px">
+
+    <div style="background:#0D3D6E;border-radius:14px;padding:16px;margin-bottom:10px;text-align:center">
+      <div style="font-size:36px;margin-bottom:6px">📲</div>
+      <div style="font-size:15px;font-weight:700;color:#fff;margin-bottom:4px">Instalar ISAT como app</div>
+      <div style="font-size:12px;color:rgba(255,255,255,.75);line-height:1.4">Acceso directo desde tu pantalla de inicio. Sin buscar archivos, sin Chrome, funciona offline.</div>
+    </div>
+
+    <!-- Android -->
+    <div style="background:#fff;border:1.5px solid #d0d8ee;border-radius:12px;margin-bottom:10px;overflow:hidden">
+      <div style="background:#3DDC84;padding:10px 14px;display:flex;align-items:center;gap:8px">
+        <div style="font-size:18px">🤖</div>
+        <div style="font-size:13px;font-weight:700;color:#1a3a1a">Android (Redmi, Samsung, etc.)</div>
+      </div>
+      <div style="padding:12px 14px">
+        <div style="display:flex;gap:10px;margin-bottom:10px;align-items:flex-start">
+          <div style="width:24px;height:24px;min-width:24px;border-radius:50%;background:#1A5FA8;color:#fff;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center">1</div>
+          <div style="font-size:12px;color:#222;line-height:1.5">Abre la app en <strong>Chrome</strong>. Si la tienes en WhatsApp, comparte el archivo y ábrelo con Chrome.</div>
+        </div>
+        <div style="display:flex;gap:10px;margin-bottom:10px;align-items:flex-start">
+          <div style="width:24px;height:24px;min-width:24px;border-radius:50%;background:#1A5FA8;color:#fff;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center">2</div>
+          <div style="font-size:12px;color:#222;line-height:1.5">Toca los <strong>tres puntos ⋮</strong> en la esquina superior derecha de Chrome.</div>
+        </div>
+        <div style="display:flex;gap:10px;margin-bottom:10px;align-items:flex-start">
+          <div style="width:24px;height:24px;min-width:24px;border-radius:50%;background:#1A5FA8;color:#fff;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center">3</div>
+          <div style="font-size:12px;color:#222;line-height:1.5">Busca <strong>"Añadir a pantalla de inicio"</strong> o <strong>"Instalar app"</strong> y tócalo.</div>
+        </div>
+        <div style="display:flex;gap:10px;align-items:flex-start">
+          <div style="width:24px;height:24px;min-width:24px;border-radius:50%;background:#3DDC84;color:#1a3a1a;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center">✓</div>
+          <div style="font-size:12px;color:#2d6a2d;line-height:1.5;font-weight:500">El ícono "ISAT" aparece en tu pantalla de inicio. La próxima vez: toca el ícono y listo.</div>
+        </div>
+        <div style="margin-top:10px;background:#eef4ff;border-radius:8px;padding:8px 10px;font-size:11px;color:#0D3D6E;line-height:1.4">
+          <strong>Nota Redmi:</strong> Si usas Mi Browser, la opción puede aparecer como "Añadir acceso directo". También puedes usar Chrome instalando desde Play Store.
+        </div>
+      </div>
+    </div>
+
+    <!-- iPhone -->
+    <div style="background:#fff;border:1.5px solid #d0d8ee;border-radius:12px;margin-bottom:10px;overflow:hidden">
+      <div style="background:#000;padding:10px 14px;display:flex;align-items:center;gap:8px">
+        <div style="font-size:18px">🍎</div>
+        <div style="font-size:13px;font-weight:700;color:#fff">iPhone (Safari)</div>
+      </div>
+      <div style="padding:12px 14px">
+        <div style="background:#fff3cd;border:1px solid #d4a030;border-radius:8px;padding:8px 10px;font-size:11px;color:#633806;margin-bottom:10px;line-height:1.4">
+          <strong>Importante:</strong> En iPhone usa <strong>Safari</strong>, no Chrome. Solo Safari permite agregar apps a la pantalla de inicio.
+        </div>
+        <div style="display:flex;gap:10px;margin-bottom:10px;align-items:flex-start">
+          <div style="width:24px;height:24px;min-width:24px;border-radius:50%;background:#000;color:#fff;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center">1</div>
+          <div style="font-size:12px;color:#222;line-height:1.5">Abre el archivo HTML en <strong>Safari</strong>. Desde WhatsApp: mantén presionado el archivo → "Abrir en Safari".</div>
+        </div>
+        <div style="display:flex;gap:10px;margin-bottom:10px;align-items:flex-start">
+          <div style="width:24px;height:24px;min-width:24px;border-radius:50%;background:#000;color:#fff;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center">2</div>
+          <div style="font-size:12px;color:#222;line-height:1.5">Toca el botón de compartir <strong>⬆</strong> (centro de la barra inferior de Safari).</div>
+        </div>
+        <div style="display:flex;gap:10px;margin-bottom:10px;align-items:flex-start">
+          <div style="width:24px;height:24px;min-width:24px;border-radius:50%;background:#000;color:#fff;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center">3</div>
+          <div style="font-size:12px;color:#222;line-height:1.5">Desliza hacia abajo en el menú y toca <strong>"Agregar a pantalla de inicio"</strong>.</div>
+        </div>
+        <div style="display:flex;gap:10px;margin-bottom:10px;align-items:flex-start">
+          <div style="width:24px;height:24px;min-width:24px;border-radius:50%;background:#000;color:#fff;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center">4</div>
+          <div style="font-size:12px;color:#222;line-height:1.5">Confirma el nombre <strong>"ISAT"</strong> y toca <strong>"Agregar"</strong> en la esquina superior derecha.</div>
+        </div>
+        <div style="display:flex;gap:10px;align-items:flex-start">
+          <div style="width:24px;height:24px;min-width:24px;border-radius:50%;background:#34C759;color:#fff;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center">✓</div>
+          <div style="font-size:12px;color:#2d6a2d;line-height:1.5;font-weight:500">El ícono aparece en tu pantalla de inicio. Abre como app completa, sin barra de Safari.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Si ya está instalada -->
+    <div style="background:#eaf3de;border:1.5px solid #70b040;border-radius:12px;padding:12px 14px;margin-bottom:10px">
+      <div style="font-size:12px;font-weight:700;color:#2d6a2d;margin-bottom:4px">✓ ¿Ya la instalaste?</div>
+      <div style="font-size:11px;color:#3a5a20;line-height:1.5">Cierra esta app y búscala en tu pantalla de inicio. El ícono se llama <strong>ISAT</strong>. Si no aparece, repite el paso 3 de arriba.</div>
+    </div>
+
+    <!-- Botón de instalación automática para Android -->
+    <button id="btn-install-pwa" onclick="triggerInstall()" style="width:100%;padding:14px;border-radius:12px;background:#1A5FA8;color:#fff;border:none;font-size:14px;font-weight:700;cursor:pointer;display:none">
+      📲 Instalar ahora (Android)
+    </button>
+  </div>
+</div>
+<div class="bottom-bar">
+  <button class="btn-main btn-save" onclick="saveRecord()">💾 Guardar registro</button>
+  <button class="btn-main btn-export" onclick="exportCSV()">⬇ CSV</button>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const DATA = {
+  T1:{peso:0.35,label:'Imanes de destino',items:[
+    {id:'S01',label:'Tienda de conveniencia',sub:'Surtido, horario, limpieza, iluminación',peso:1.0},
+    {id:'S02',label:'Franquicia de alimentos',sub:'Burger King, Subway, Oxxo Food, etc.',peso:1.0},
+    {id:'S03',label:'Cajero automático (ATM)',sub:'Operativo, marca visible, iluminado',peso:0.9},
+    {id:'S04',label:'Pensión de operadores / trileros',sub:'Regaderas, área descanso, sanitarios exclusivos',peso:0.8},
+    {id:'S05',label:'WiFi gratuito',sub:'Señal funcional, contraseña visible',peso:0.6}
+  ]},
+  T2:{peso:0.30,label:'Captación de paso',items:[
+    {id:'S06',label:'Car wash / lavado',sub:'Operativo, precios visibles, tipos de lavado',peso:1.0},
+    {id:'S07',label:'Baños públicos',sub:'Score calculado automáticamente desde auditoría',peso:1.0},
+    {id:'S08',label:'Área de descanso / espera techada',sub:'Sillas, sombra, limpieza',peso:0.7},
+    {id:'S09',label:'Agua y bebidas accesibles al conductor',sub:'Dispensador o nevera visible',peso:0.5},
+    {id:'S10',label:'Display de precios externo',sub:'Visible desde la calle, actualizado',peso:0.6}
+  ]},
+  T3:{peso:0.20,label:'Servicios al vehículo',items:[
+    {id:'S11',label:'Vulcanizadora / inflado llantas',sub:'Operativa, nitrógeno disponible',peso:1.0},
+    {id:'S12',label:'Verificación de niveles',sub:'¿El despachador lo ofrece proactivamente?',peso:0.8},
+    {id:'S13',label:'Venta de aceites y lubricantes',sub:'Exhibición visible, marcas, precio',peso:0.9},
+    {id:'S14',label:'Cambio de aceite / servicio express',sub:'Bahía exclusiva, tiempo comunicado',peso:0.8},
+    {id:'S15',label:'Aditivos y productos automotrices',sub:'Variedad, señalización, precio visible',peso:0.6}
+  ]},
+  T4:{peso:0.15,label:'Habilitadores de confianza',items:[
+    {id:'S16',label:'Tarjetas bancarias',sub:'Terminales operativas, sin comisión extra',peso:1.0},
+    {id:'S17',label:'Vales / monedero flotillas',sub:'Edenred, Sodexo, Efectivale, sistema propio',peso:0.9},
+    {id:'S18',label:'Facturación electrónica en punto',sub:'QR, terminal o código en bomba',peso:0.7},
+    {id:'S19',label:'Seguridad visible',sub:'Cámaras, guardia, iluminación nocturna',peso:0.6}
+  ]}
+};
+
+const BANOS=[
+  {id:'B01',label:'Acceso libre sin cobro'},
+  {id:'B02',label:'Señalización visible desde el patio'},
+  {id:'B03',label:'Puerta con cerrojo funcional'},
+  {id:'B04',label:'Piso seco y sin suciedad visible'},
+  {id:'B05',label:'Taza limpia, sin manchas ni olores'},
+  {id:'B06',label:'Papel higiénico disponible'},
+  {id:'B07',label:'Jabón en dispensador operativo'},
+  {id:'B08',label:'Agua corriente (llave funcional)'},
+  {id:'B09',label:'Toallas / secadora de manos'},
+  {id:'B10',label:'Bote de basura con bolsa'},
+  {id:'B11',label:'Iluminación funcional'},
+  {id:'B12',label:'Ventilación (ventana o extractor)'},
+  {id:'B13',label:'Separación hombres / mujeres'}
+];
+
+let sc={}, banoSc={};
+
+function buildItems(){
+  Object.keys(DATA).forEach(tier=>{
+    const div=document.getElementById('items-'+tier);
+    DATA[tier].items.forEach(it=>{
+      sc[it.id]=null;
+      const disabled = it.id==='S07' ? 'style="opacity:.7;pointer-events:none"' : '';
+      div.innerHTML+=`<div class="item" id="item-${it.id}">
+        <div class="item-name">${it.id} — ${it.label}</div>
+        <div class="item-sub">${it.sub}</div>
+        <div class="scoring" ${disabled}>
+          ${[0,1,2,3].map(v=>`<button class="sc-btn s${v}" id="sc-${it.id}-${v}" onclick="setSc('${it.id}',${v},'${tier}')" ontouchstart="">${v}</button>`).join('')}
+          <button class="sc-na" id="sc-${it.id}-na" onclick="setNA('${it.id}','${tier}')" ontouchstart="">N/A</button>
+        </div>
+      </div>`;
+    });
+  });
+  const bd=document.getElementById('items-banos');
+  BANOS.forEach(b=>{
+    banoSc[b.id]=null;
+    bd.innerHTML+=`<div class="bano-item">
+      <span class="bano-lbl">${b.id} · ${b.label}</span>
+      <div class="bano-btns">
+        <button class="bano-btn" id="bano-ok-${b.id}" onclick="setBano('${b.id}',1)" ontouchstart="">✓</button>
+        <button class="bano-btn" id="bano-fail-${b.id}" onclick="setBano('${b.id}',0)" ontouchstart="">✗</button>
+        <button class="bano-btn na" id="bano-na-${b.id}" onclick="setBanoNA('${b.id}')" ontouchstart="">N/A</button>
+      </div>
+    </div>`;
+  });
+}
+
+function setSc(id,val,tier){
+  sc[id]=val;
+  [0,1,2,3].forEach(v=>{
+    const b=document.getElementById(`sc-${id}-${v}`);
+    b.className=`sc-btn s${v}${v===val?' sel':''}`;
+  });
+  const na=document.getElementById(`sc-${id}-na`);
+  if(na) na.className='sc-na';
+  updateTierPts(tier);
+  recalcAll();
+}
+
+function setNA(id,tier){
+  sc[id]='na';
+  [0,1,2,3].forEach(v=>{
+    document.getElementById(`sc-${id}-${v}`).className=`sc-btn s${v}`;
+  });
+  document.getElementById(`sc-${id}-na`).className='sc-na sel';
+  updateTierPts(tier);
+  recalcAll();
+}
+
+function setBano(id,val){
+  banoSc[id]=val;
+  document.getElementById(`bano-ok-${id}`).className='bano-btn'+(val===1?' ok':'');
+  document.getElementById(`bano-fail-${id}`).className='bano-btn'+(val===0?' fail':'');
+  document.getElementById(`bano-na-${id}`).className='bano-btn na';
+  recalcBanos();
+}
+
+function setBanoNA(id){
+  banoSc[id]='na';
+  document.getElementById(`bano-ok-${id}`).className='bano-btn';
+  document.getElementById(`bano-fail-${id}`).className='bano-btn';
+  document.getElementById(`bano-na-${id}`).className='bano-btn na sel';
+  recalcBanos();
+}
+
+function recalcBanos(){
+  let ok=0,tot=0;
+  BANOS.forEach(b=>{const v=banoSc[b.id];if(v!==null&&v!=='na'){tot++;if(v===1)ok++;}});
+  const pct=tot>0?ok/tot:0;
+  const auto=pct>=0.85?3:pct>=0.65?2:pct>=0.40?1:0;
+  const okCount=BANOS.filter(b=>banoSc[b.id]===1).length;
+  document.getElementById('pts-banos').textContent=`${okCount}/13`;
+  if(tot>0){
+    sc['S07']=auto;
+    [0,1,2,3].forEach(v=>{
+      const b=document.getElementById(`sc-S07-${v}`);
+      if(b) b.className=`sc-btn s${v}${v===auto?' sel':''}`;
+    });
+    updateTierPts('T2');
+    recalcAll();
+  }
+}
+
+function updateTierPts(tier){
+  let got=0,max=0;
+  DATA[tier].items.forEach(it=>{
+    const v=sc[it.id];
+    if(v!==null&&v!=='na'){got+=v;max+=3;}
+    else if(v===null) max+=3;
+  });
+  document.getElementById('pts-'+tier).textContent=`${got}/${max} pts`;
+}
+
+function recalcAll(){
+  const tierScores={};
+  Object.keys(DATA).forEach(tier=>{
+    let sumW=0,sumMax=0;
+    DATA[tier].items.forEach(it=>{
+      const v=sc[it.id];
+      if(v!==null&&v!=='na'){sumW+=v/3*it.peso;sumMax+=it.peso;}
+    });
+    tierScores[tier]=sumMax>0?Math.round(sumW/sumMax*100):0;
+  });
+  let global=0;
+  Object.keys(DATA).forEach(t=>{global+=tierScores[t]*DATA[t].peso;});
+  const total=Math.round(global);
+  document.getElementById('hdr-score').textContent=total;
+  document.getElementById('r-big').textContent=total;
+  document.getElementById('r-t1').textContent=tierScores.T1;
+  document.getElementById('r-t2').textContent=tierScores.T2;
+  document.getElementById('r-t3').textContent=tierScores.T3;
+  document.getElementById('r-t4').textContent=tierScores.T4;
+  let nivel,nota,bg,tc;
+  if(total>=80){nivel='Alto generador';nota='Ecosistema de servicios que genera tráfico adicional significativo. Ventaja competitiva real frente a competidores.';bg='#eaf3de';tc='#2d6a2d';}
+  else if(total>=60){nivel='Generador medio';nota='Base adecuada. Hay oportunidades concretas para ampliar oferta e incrementar litros libres.';bg='#faeeda';tc='#633806';}
+  else if(total>=40){nivel='Generador básico';nota='Oferta mínima. La estación depende casi exclusivamente del precio y ubicación. Riesgo de pérdida de participación.';bg='#fcebeb';tc='#8a1f1f';}
+  else{nivel='Sin generación';nota='La estación no cuenta con servicios que atraigan tráfico adicional. Vulnerabilidad alta ante competidores con mayor oferta.';bg='#fcebeb';tc='#8a1f1f';}
+  document.getElementById('r-nivel').textContent=nivel;
+  document.getElementById('r-nivel').style.background=bg;
+  document.getElementById('r-nivel').style.color=tc;
+  document.getElementById('result-total-box').style.background=bg;
+  document.getElementById('result-total-box').style.borderColor=tc;
+  document.getElementById('r-big').style.color=tc;
+  document.getElementById('r-nota').style.background=bg;
+  document.getElementById('r-nota').style.color=tc;
+  document.getElementById('r-nota').style.border='1px solid '+tc;
+  document.getElementById('r-nota').textContent=nota;
+}
+
+function getFormData(){
+  return{
+    clave:document.getElementById('d-clave').value,
+    nombre:document.getElementById('d-nombre').value,
+    grupo:document.getElementById('d-grupo').value,
+    evaluador:document.getElementById('d-eval').value,
+    turno:document.getElementById('d-turno').value,
+    fecha:document.getElementById('d-fecha').value,
+    hora:document.getElementById('d-hora').value,
+    video:document.getElementById('d-video').value,
+    obs_general:document.getElementById('d-obs').value,
+    obs_T1:document.getElementById('obs-T1').value,
+    obs_T2:document.getElementById('obs-T2').value,
+    obs_banos:document.getElementById('obs-banos').value,
+    obs_T3:document.getElementById('obs-T3').value,
+    obs_T4:document.getElementById('obs-T4').value,
+  };
+}
+
+function saveRecord(){
+  recalcAll();
+  const fd=getFormData();
+  if(!fd.clave){showToast('⚠ Selecciona una estación primero');return;}
+  const tierScores={};
+  Object.keys(DATA).forEach(tier=>{
+    let sumW=0,sumMax=0;
+    DATA[tier].items.forEach(it=>{
+      const v=sc[it.id];
+      if(v!==null&&v!=='na'){sumW+=v/3*it.peso;sumMax+=it.peso;}
+    });
+    tierScores[tier]=sumMax>0?Math.round(sumW/sumMax*100):0;
+  });
+  let global=0;
+  Object.keys(DATA).forEach(t=>{global+=tierScores[t]*DATA[t].peso;});
+  const record={
+    ts:Date.now(),
+    ...fd,
+    isat:Math.round(global),
+    t1:tierScores.T1,t2:tierScores.T2,t3:tierScores.T3,t4:tierScores.T4,
+    scores:{...sc},
+    banos:{...banoSc}
+  };
+  const stored=JSON.parse(localStorage.getItem('isat_records')||'[]');
+  stored.push(record);
+  localStorage.setItem('isat_records',JSON.stringify(stored));
+  renderHistory();
+
+// Sync HeyCyan preview when form fields change
+['d-clave','d-fecha','d-turno'].forEach(id => {
+  const el = document.getElementById(id);
+  if(el) el.addEventListener('change', syncHCPreview);
+});
+
+  showToast('✓ Registro guardado — ISAT '+record.isat);
+  goTab(6);
+}
+
+function exportCSV(){
+  const records=JSON.parse(localStorage.getItem('isat_records')||'[]');
+  if(!records.length){showToast('Sin registros para exportar');return;}
+  const allItems=[];
+  Object.keys(DATA).forEach(t=>DATA[t].items.forEach(it=>allItems.push(it.id)));
+  const banoIds=BANOS.map(b=>b.id);
+  const headers=['Timestamp','Fecha','Hora','Clave','Nombre','Grupo','Evaluador','Turno','ISAT','T1_Imanes','T2_Paso','T3_Vehiculo','T4_Confianza',...allItems,...banoIds,'Video','Obs_General','Obs_T1','Obs_T2','Obs_Banos','Obs_T3','Obs_T4'];
+  const rows=records.map(r=>{
+    const base=[new Date(r.ts).toISOString(),r.fecha||'',r.hora||'',r.clave||'',r.nombre||'',r.grupo||'',r.evaluador||'',r.turno||'',r.isat||0,r.t1||0,r.t2||0,r.t3||0,r.t4||0];
+    const sVals=allItems.map(id=>r.scores&&r.scores[id]!=null?r.scores[id]:'');
+    const bVals=banoIds.map(id=>r.banos&&r.banos[id]!=null?r.banos[id]:'');
+    const extra=[r.video||'',escapeCSV(r.obs_general||''),escapeCSV(r.obs_T1||''),escapeCSV(r.obs_T2||''),escapeCSV(r.obs_banos||''),escapeCSV(r.obs_T3||''),escapeCSV(r.obs_T4||'')];
+    return[...base,...sVals,...bVals,...extra].join(',');
+  });
+  const csv=[headers.join(','),...rows].join('\n');
+  const blob=new Blob(['\uFEFF'+csv],{type:'text/csv;charset=utf-8;'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');
+  a.href=url;
+  a.download='ISAT_TopEnergy_'+new Date().toISOString().slice(0,10)+'.csv';
+  document.body.appendChild(a);a.click();document.body.removeChild(a);
+  showToast('✓ CSV exportado ('+records.length+' registros)');
+}
+
+function escapeCSV(s){return '"'+String(s).replace(/"/g,'""')+'"';}
+
+function renderHistory(){
+  const records=JSON.parse(localStorage.getItem('isat_records')||'[]');
+  const div=document.getElementById('hist-list');
+  document.getElementById('hist-count').textContent=records.length+' visitas';
+  if(!records.length){div.innerHTML='<div style="padding:16px;font-size:13px;color:var(--sub);text-align:center">Sin registros aún</div>';return;}
+  div.innerHTML=[...records].reverse().map((r,i)=>{
+    const score=r.isat||0;
+    const bg=score>=80?'#eaf3de':score>=60?'#faeeda':'#fcebeb';
+    const tc=score>=80?'#2d6a2d':score>=60?'#633806':'#8a1f1f';
+    return`<div class="visit-item">
+      <div>
+        <div class="visit-name">${r.clave||'Sin clave'} · ${r.nombre||''}</div>
+        <div class="visit-meta">${r.fecha||''} ${r.hora||''} · ${r.evaluador||''} · ${r.turno||''}</div>
+        ${r.video?`<div class="visit-meta">📹 ${r.video}</div>`:''}
+      </div>
+      <div style="display:flex;align-items:center;gap:6px">
+        <span class="visit-score" style="background:${bg};color:${tc}">${score}</span>
+        <button class="del-btn" onclick="delRecord(${records.length-1-i})">✕</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function delRecord(idx){
+  if(!confirm('¿Eliminar este registro?'))return;
+  const records=JSON.parse(localStorage.getItem('isat_records')||'[]');
+  records.splice(idx,1);
+  localStorage.setItem('isat_records',JSON.stringify(records));
+  renderHistory();
+
+// Sync HeyCyan preview when form fields change
+['d-clave','d-fecha','d-turno'].forEach(id => {
+  const el = document.getElementById(id);
+  if(el) el.addEventListener('change', syncHCPreview);
+});
+
+  showToast('Registro eliminado');
+}
+
+function clearAll(){
+  if(!confirm('¿Eliminar TODOS los registros? Esta acción no se puede deshacer.'))return;
+  localStorage.removeItem('isat_records');
+  renderHistory();
+
+// Sync HeyCyan preview when form fields change
+['d-clave','d-fecha','d-turno'].forEach(id => {
+  const el = document.getElementById(id);
+  if(el) el.addEventListener('change', syncHCPreview);
+});
+
+  showToast('Historial limpiado');
+}
+
+function goTab(n){
+  document.querySelectorAll('.section').forEach((s,i)=>{s.classList.toggle('active',i===n);});
+  document.querySelectorAll('.nav-tab').forEach((t,i)=>{t.classList.toggle('active',i===n);});
+  document.querySelectorAll('.nav-tab')[n].scrollIntoView({inline:'center',behavior:'smooth'});
+  if(n===6)recalcAll();
+  if(n===8)renderHistory();
+
+// Sync HeyCyan preview when form fields change
+['d-clave','d-fecha','d-turno'].forEach(id => {
+  const el = document.getElementById(id);
+  if(el) el.addEventListener('change', syncHCPreview);
+});
+
+}
+
+function showToast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg;t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),2200);
+}
+
+
+// ── HeyCyan guide functions ────────────────────────────────────────────────
+function toggleHCGuide(){
+  const body = document.getElementById('hc-guide-body');
+  const lbl  = document.getElementById('hc-toggle-lbl');
+  const open = body.style.display !== 'none';
+  body.style.display = open ? 'none' : 'block';
+  lbl.textContent = open ? '\u25BC ver' : '\u25B2 cerrar';
+}
+
+const HC_HELP = {
+  clave: {
+    bg:'#eef4ff', border:'#1a5fa8', color:'#0d3d6e',
+    title:'CLAVE de la estacion',
+    text:'Es la clave del catalogo de las 63 estaciones. Las 21 de Top Energy van de TE-01 (Alamitos) a TE-21 (Villa Magna). Los competidores: CA-01 a CA-21 y CB-01 a CB-21. Esta clave debe coincidir EXACTAMENTE con la que seleccionaste arriba en este formulario.'
+  },
+  fecha: {
+    bg:'#e1f5ee', border:'#0a5c44', color:'#085041',
+    title:'FECHA en formato AAAAMMDD',
+    text:'La fecha del dia en que haces la visita, sin guiones ni espacios. Ejemplo: si visitas el 21 de junio de 2026 escribes 20260621. Siempre 8 digitos: 4 del ano, 2 del mes, 2 del dia.'
+  },
+  turno: {
+    bg:'#faeeda', border:'#633806', color:'#633806',
+    title:'TURNO de la visita',
+    text:'M = Manana (07:00 a 12:00 hrs). T = Tarde (12:00 a 18:00 hrs). N = Noche (18:00 a 22:00 hrs). Usa la misma letra en la carpeta HeyCyan, en la nota de texto dentro de HeyCyan y en este campo.'
+  }
+};
+
+function showHCHelp(key){
+  const h = HC_HELP[key];
+  const box = document.getElementById('hc-help-box');
+  box.style.display = 'block';
+  box.style.background = h.bg;
+  box.style.border = '1px solid ' + h.border;
+  box.style.color = h.color;
+  box.innerHTML = '<strong>' + h.title + '</strong><br>' + h.text;
+  // update preview highlight
+  ['clave','fecha','turno'].forEach(k => {
+    const el = document.getElementById('hc-b-' + k);
+    if(el) el.style.textDecoration = k === key ? 'underline' : 'none';
+  });
+}
+
+function updateVideoPreview(val){
+  // Auto-update the preview block if user types in the field
+  const pre = document.getElementById('hc-preview-code');
+  if(pre && val.trim()) pre.textContent = val.trim();
+  // Also auto-fill the code builder blocks if format matches TE-XX_YYYYMMDD_T
+  const m = val.match(/^([A-Z]{2}-\d{2})_(\d{8})_([MTN])$/i);
+  if(m){
+    const cl = document.getElementById('hc-b-clave');
+    const fe = document.getElementById('hc-b-fecha');
+    const tu = document.getElementById('hc-b-turno');
+    if(cl) cl.textContent = m[1].toUpperCase();
+    if(fe) fe.textContent = m[2];
+    if(tu) tu.textContent = m[3].toUpperCase();
+    if(pre) pre.textContent = m[1].toUpperCase() + '_' + m[2] + '_' + m[3].toUpperCase();
+  }
+}
+
+function usarCodigo(){
+  const code = document.getElementById('hc-preview-code').textContent;
+  const field = document.getElementById('d-video');
+  if(field && code){
+    field.value = code;
+    showToast('\u2713 Codigo copiado al campo');
+    // close the guide
+    const body = document.getElementById('hc-guide-body');
+    const lbl  = document.getElementById('hc-toggle-lbl');
+    if(body){ body.style.display = 'none'; }
+    if(lbl){ lbl.textContent = '\u25BC ver'; }
+  }
+}
+
+// Auto-populate date and turno in the preview based on form values
+function syncHCPreview(){
+  const fechaEl = document.getElementById('d-fecha');
+  const turnoEl = document.getElementById('d-turno');
+  const claveEl = document.getElementById('d-clave');
+  const pre = document.getElementById('hc-preview-code');
+  if(!pre) return;
+  
+  let clave = 'TE-01';
+  if(claveEl && claveEl.value){
+    // Extract e.g. TE-01 from "TE-01 — Alamitos"
+    const m = claveEl.value.match(/^([A-Z]{2}-\d{2})/);
+    if(m) clave = m[1];
+  }
+  
+  let fecha = '20260621';
+  if(fechaEl && fechaEl.value){
+    fecha = fechaEl.value.replace(/-/g,'');
+  }
+  
+  let turno = 'M';
+  if(turnoEl && turnoEl.value){
+    if(turnoEl.value.includes('Tarde')) turno = 'T';
+    else if(turnoEl.value.includes('Noche')) turno = 'N';
+    else turno = 'M';
+  }
+  
+  const code = clave + '_' + fecha + '_' + turno;
+  pre.textContent = code;
+  const cl = document.getElementById('hc-b-clave');
+  const fe = document.getElementById('hc-b-fecha');
+  const tu = document.getElementById('hc-b-turno');
+  if(cl) cl.textContent = clave;
+  if(fe) fe.textContent = fecha;
+  if(tu) tu.textContent = turno;
+}
+// ── End HeyCyan guide functions ───────────────────────────────────────────
+
+
+function triggerInstall(){
+  if(window._deferredPrompt){
+    window._deferredPrompt.prompt();
+    window._deferredPrompt.userChoice.then(r => {
+      if(r.outcome === 'accepted') showToast('\u2713 Instalando ISAT...');
+      window._deferredPrompt = null;
+    });
+  }
+}
+// install prompt removed
+buildItems();
+document.getElementById('d-fecha').value=new Date().toISOString().slice(0,10); syncHCPreview();
+document.getElementById('d-hora').value=new Date().toTimeString().slice(0,5);
+renderHistory();
+
+// Sync HeyCyan preview when form fields change
+['d-clave','d-fecha','d-turno'].forEach(id => {
+  const el = document.getElementById(id);
+  if(el) el.addEventListener('change', syncHCPreview);
+});
+
+</script>
+
+<script>
+// PWA features removed for local file compatibility
+
+</script>
+</body>
+</html>

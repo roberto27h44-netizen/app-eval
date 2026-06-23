@@ -1,0 +1,1038 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Ciclo de Servicio · Top Energy</title>
+<style>
+:root{
+  --morado:#2d2d9e;--morado2:#1a1a5e;--morado3:#4040c0;
+  --verde:#1f5c1f;--rojo:#8a1f1f;--ambar:#7a4b00;
+  --bg:#f4f5fb;--card:#fff;--border:#d0d4e8;
+  --text:#1a1c28;--sub:#5a6080;
+  --te-bg:#eef0ff;--te-c:#2d2d9e;--te-border:#b0b8e8;
+  --comp-bg:#fff4f0;--comp-c:#8a3010;--comp-border:#e8b0a0;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;background:var(--bg);color:var(--text);font-size:15px;padding-bottom:80px;line-height:1.4}
+
+.app-hdr{background:var(--morado2);color:#fff;padding:10px 14px 8px;position:sticky;top:0;z-index:100;box-shadow:0 2px 8px rgba(0,0,0,.25)}
+.app-hdr h1{font-size:14px;font-weight:700}
+.app-hdr p{font-size:10px;opacity:.8;margin-top:1px}
+.hdr-row{display:flex;justify-content:space-between;align-items:flex-start}
+.score-pill{background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.3);border-radius:18px;padding:3px 10px;text-align:center;min-width:64px}
+.score-pill .num{font-size:18px;font-weight:700;line-height:1}
+.score-pill .lbl{font-size:9px;opacity:.8}
+
+.nav-tabs{display:flex;background:#fff;border-bottom:1px solid var(--border);position:sticky;top:50px;z-index:99;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+.nav-tabs::-webkit-scrollbar{display:none}
+.nav-tab{flex:none;padding:9px 12px;font-size:10px;color:var(--sub);cursor:pointer;border-bottom:2.5px solid transparent;white-space:nowrap;background:#fff;border-left:none;border-right:none;border-top:none}
+.nav-tab.active{color:var(--morado);border-bottom-color:var(--morado);font-weight:700}
+
+.section{display:none;padding:10px}
+.section.active{display:block}
+
+/* CLUSTERS */
+.cluster-intro{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:12px;margin-bottom:10px;font-size:12px;color:var(--sub);line-height:1.6}
+.cluster-intro strong{color:var(--morado2)}
+
+.cluster-list-item{background:var(--card);border:1px solid var(--border);border-radius:12px;margin-bottom:8px;overflow:hidden;cursor:pointer;-webkit-tap-highlight-color:rgba(0,0,0,.05)}
+.cluster-list-item:active{background:#f0f2ff}
+.cluster-list-hdr{padding:10px 12px;display:flex;align-items:center;gap:10px}
+.cluster-num{background:var(--morado);color:#fff;font-size:11px;font-weight:700;padding:3px 8px;border-radius:8px}
+.cluster-name{font-size:14px;font-weight:700;flex:1}
+.cluster-mun{font-size:10px;color:var(--sub)}
+.cluster-arrow{color:var(--sub);font-size:16px}
+
+/* CLUSTER DETAIL */
+.cluster-detail{background:var(--card);border-radius:12px;border:2px solid var(--morado);padding:12px;margin-bottom:10px}
+.cluster-detail-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid var(--border)}
+.cluster-detail-title{font-size:15px;font-weight:700;color:var(--morado2)}
+.btn-back{background:none;border:1px solid var(--border);border-radius:8px;padding:5px 10px;font-size:11px;color:var(--sub);cursor:pointer}
+
+.cluster-instruction{background:#fff3cd;border:1px solid #d4a030;border-radius:8px;padding:8px 10px;font-size:11px;color:#633806;margin-bottom:10px;line-height:1.5}
+
+.station-option{border:2px solid var(--border);border-radius:10px;padding:10px 12px;margin-bottom:8px;cursor:pointer;background:var(--card);transition:transform .1s}
+.station-option:active{transform:scale(.98)}
+.station-option.te{border-color:var(--te-border);background:var(--te-bg)}
+.station-option.comp{border-color:var(--comp-border);background:var(--comp-bg)}
+.station-option.selected{border-width:3px}
+.station-option.te.selected{border-color:var(--morado);box-shadow:0 0 0 2px rgba(45,45,158,.2)}
+.station-option.comp.selected{border-color:var(--comp-c);box-shadow:0 0 0 2px rgba(138,48,16,.2)}
+
+.station-opt-top{display:flex;align-items:center;gap:8px;margin-bottom:4px}
+.station-opt-icon{font-size:18px;flex-shrink:0}
+.station-opt-code{font-size:11px;font-weight:700;padding:2px 7px;border-radius:8px;background:rgba(0,0,0,.1)}
+.te .station-opt-code{background:#2d2d9e;color:#fff}
+.comp .station-opt-code{background:#8a3010;color:#fff}
+.station-opt-name{font-size:13px;font-weight:700;flex:1}
+.station-opt-marca{font-size:9px;padding:1px 5px;border-radius:6px;background:rgba(0,0,0,.1)}
+.station-opt-addr{font-size:11px;color:var(--sub);line-height:1.4;padding-left:26px}
+
+.maps-btn{display:inline-block;margin-top:6px;margin-left:26px;padding:4px 10px;font-size:10px;background:#1976d2;color:#fff;border:none;border-radius:6px;text-decoration:none;font-weight:600;cursor:pointer}
+
+/* FORM */
+.form-card{background:var(--card);border-radius:12px;border:1px solid var(--border);padding:12px;margin-bottom:10px}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px}
+.form-row.full{grid-template-columns:1fr}
+.form-lbl{font-size:10px;color:var(--sub);font-weight:600;display:block;margin-bottom:3px}
+.form-input{width:100%;padding:9px 10px;border:1.5px solid var(--border);border-radius:8px;font-size:13px;color:var(--text);background:var(--card);-webkit-appearance:none;font-family:inherit}
+.form-input:focus{border-color:var(--morado);outline:none}
+select.form-input{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath d='M2 4l4 4 4-4' stroke='%235a6080' stroke-width='1.5' fill='none'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center;padding-right:28px}
+
+/* SELECTED STATION DISPLAY */
+.station-selected{background:var(--card);border:2px solid var(--morado);border-radius:12px;padding:12px;margin-bottom:10px}
+.station-sel-row{display:flex;align-items:center;gap:10px}
+.station-sel-icon{font-size:24px}
+.station-sel-info{flex:1}
+.station-sel-name{font-size:14px;font-weight:700}
+.station-sel-addr{font-size:11px;color:var(--sub);margin-top:2px;line-height:1.3}
+.station-sel-marca{display:inline-block;font-size:9px;padding:2px 6px;border-radius:8px;margin-top:4px;font-weight:600}
+
+/* CRONÓMETRO */
+.crono-card{background:var(--card);border-radius:12px;border:1px solid var(--border);overflow:hidden;margin-bottom:10px}
+.crono-hdr{padding:8px 12px;background:var(--morado2);color:#fff;font-size:11px;font-weight:700}
+.crono-grid{display:grid;grid-template-columns:1fr 1fr;gap:0}
+.crono-item{padding:10px 12px;border-bottom:1px solid var(--border);border-right:1px solid var(--border)}
+.crono-item:nth-child(even){border-right:none}
+.crono-item:nth-last-child(-n+1){border-bottom:none}
+.crono-lbl{font-size:9px;color:var(--sub);font-weight:600;text-transform:uppercase;margin-bottom:4px}
+.crono-time{font-size:13px;font-weight:700;color:var(--morado);font-family:monospace;margin-bottom:4px}
+.crono-btn{width:100%;padding:7px;border-radius:8px;border:1.5px solid var(--morado);background:var(--te-bg);color:var(--morado);font-size:11px;font-weight:700;cursor:pointer;-webkit-appearance:none;font-family:inherit}
+.crono-btn.marcado{background:var(--morado);color:#fff;border-color:var(--morado)}
+.crono-btn:active{transform:scale(.95)}
+
+.intervalos{padding:10px 12px;background:#f8f9ff;border-top:1px solid var(--border)}
+.int-row{display:flex;justify-content:space-between;align-items:center;padding:4px 0;border-bottom:1px solid #eee}
+.int-row:last-child{border-bottom:none}
+.int-lbl{font-size:10px;color:var(--sub)}
+.int-val{font-size:12px;font-weight:700;font-family:monospace;color:var(--morado)}
+
+/* MOMENTOS */
+.fase-banner{padding:8px 12px;margin-bottom:6px;border-radius:10px;display:flex;align-items:center;gap:8px}
+.fase-banner.f1{background:#e8f0ff}
+.fase-banner.f2{background:#fff3e8}
+.fase-banner.f3{background:#e8ffe8}
+.fase-banner.f4{background:#ffe8ff}
+.fase-num{font-size:11px;font-weight:700;padding:3px 8px;border-radius:8px;color:#fff}
+.f1 .fase-num{background:#3050c0}
+.f2 .fase-num{background:#c06010}
+.f3 .fase-num{background:#206020}
+.f4 .fase-num{background:#802080}
+.fase-title{font-size:12px;font-weight:700}
+.f1 .fase-title{color:#2040a0}
+.f2 .fase-title{color:#904010}
+.f3 .fase-title{color:#105010}
+.f4 .fase-title{color:#601060}
+
+.momento-card{background:var(--card);border-radius:12px;border:1px solid var(--border);margin-bottom:8px;overflow:hidden}
+.momento-hdr{padding:9px 12px;display:flex;align-items:center;gap:8px}
+.momento-num{font-size:10px;font-weight:700;padding:2px 7px;border-radius:8px;flex-shrink:0}
+.crit-alto{background:#fff0f0;color:#8a1f1f;border:1px solid #e09090}
+.crit-med{background:#fff8ee;color:#7a4b00;border:1px solid #d4a030}
+.crit-bajo{background:#f0f8ff;color:#2060a0;border:1px solid #a0c0e0}
+.momento-title{font-size:12px;font-weight:700;flex:1;line-height:1.3}
+.momento-score-display{font-size:18px;font-weight:700;min-width:28px;text-align:right}
+
+.score-row{display:flex;gap:5px;padding:8px 12px;border-top:1px solid var(--border);align-items:center}
+.sc{flex:1;height:40px;border-radius:9px;border:1.5px solid var(--border);font-size:14px;font-weight:700;cursor:pointer;background:var(--bg);color:var(--sub);-webkit-appearance:none;display:flex;align-items:center;justify-content:center;font-family:inherit}
+.sc:active{transform:scale(.92)}
+.sc.s0.sel{background:#fcebeb;border-color:#d07070;color:#8a1f1f}
+.sc.s1.sel{background:#fff3e0;border-color:#c08030;color:#7a4b00}
+.sc.s2.sel{background:#e8f4e8;border-color:#60a060;color:#1f5c1f}
+.sc.s3.sel{background:#e8e8ff;border-color:#7070c0;color:#2d2d9e}
+.sc-na{width:38px;height:40px;border-radius:9px;border:1.5px dashed var(--border);font-size:9px;font-weight:600;cursor:pointer;background:var(--bg);color:var(--sub);-webkit-appearance:none;font-family:inherit}
+.sc-na.sel{background:#f0f0f0;border-color:#999;color:#555}
+
+.momento-obs{width:calc(100% - 24px);margin:4px 12px 10px;padding:7px 10px;border:1.5px solid var(--border);border-radius:8px;font-size:12px;resize:none;min-height:46px;color:var(--text);background:var(--card);font-family:inherit}
+
+.peak-tag{font-size:9px;font-weight:700;padding:1px 5px;border-radius:5px;background:#ffe0a0;color:#7a4b00;margin-left:4px}
+.final-tag{font-size:9px;font-weight:700;padding:1px 5px;border-radius:5px;background:#ffd0d0;color:#8a1f1f;margin-left:4px}
+
+/* NPS */
+.nps-card{background:var(--card);border-radius:12px;border:1px solid var(--border);padding:12px;margin-bottom:10px}
+.nps-lbl{font-size:11px;color:var(--sub);margin-bottom:8px;line-height:1.4}
+.nps-btns{display:flex;gap:4px;flex-wrap:wrap}
+.nps-btn{flex:1;min-width:28px;height:36px;border-radius:8px;border:1.5px solid var(--border);font-size:12px;font-weight:700;cursor:pointer;background:var(--bg);color:var(--sub);-webkit-appearance:none;font-family:inherit}
+.nps-btn.sel-det{background:#fcebeb;border-color:#d07070;color:#8a1f1f}
+.nps-btn.sel-neu{background:#fff8ee;border-color:#c08030;color:#7a4b00}
+.nps-btn.sel-pro{background:#e8f4e8;border-color:#60a060;color:#1f5c1f}
+.nps-result{margin-top:8px;font-size:11px;font-weight:600;text-align:center;padding:5px;border-radius:8px}
+
+/* EVIDENCIAS */
+.ev-section{background:var(--card);border-radius:12px;border:1px solid var(--border);margin-bottom:10px;overflow:hidden}
+.ev-hdr{padding:8px 12px;display:flex;align-items:center;gap:8px}
+.ev-icon{font-size:16px}
+.ev-title{font-size:12px;font-weight:700;flex:1}
+.ev-cam-badge{font-size:10px;padding:2px 7px;border-radius:8px;font-weight:600}
+.cam-wolfbox{background:#1a3a6a;color:#fff}
+.cam-gopro{background:#1a4a1a;color:#fff}
+.cam-hc{background:#1a1a4a;color:#fff}
+.ev-body{padding:8px 12px 12px}
+.ev-code{font-family:monospace;font-size:12px;background:#f0f2ff;border:1px solid #b0b8e8;border-radius:7px;padding:6px 10px;margin:6px 0;color:var(--morado2);word-break:break-all}
+.ev-step{display:flex;gap:8px;margin-bottom:8px;align-items:flex-start}
+.ev-step-num{width:20px;height:20px;min-width:20px;border-radius:50%;background:var(--morado);color:#fff;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center}
+.ev-step-txt{font-size:11px;color:var(--text);line-height:1.5;flex:1}
+.ev-input{width:100%;padding:7px 10px;border:1.5px solid var(--border);border-radius:8px;font-size:12px;font-family:monospace;color:var(--text);background:var(--card);margin-top:4px}
+
+/* RESULT */
+.result-box{background:var(--card);border-radius:14px;border:1px solid var(--border);padding:14px;margin-bottom:10px;text-align:center}
+.result-big{font-size:52px;font-weight:700;line-height:1}
+.result-lbl{font-size:12px;color:var(--sub);margin-top:4px}
+.result-nivel{display:inline-block;padding:5px 16px;border-radius:20px;font-size:12px;font-weight:700;margin-top:8px}
+.tier-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}
+.tier-card{border-radius:10px;padding:10px;text-align:center}
+.tier-card .tn{font-size:22px;font-weight:700}
+.tier-card .tl{font-size:9px;margin-top:2px}
+
+/* HISTORIAL */
+.hist-item{padding:10px 12px;border-top:1px solid var(--border);display:flex;align-items:center;gap:10px}
+.hist-score{font-size:16px;font-weight:700;padding:4px 10px;border-radius:20px;flex-shrink:0}
+.hist-info{flex:1}
+.hist-name{font-size:12px;font-weight:600}
+.hist-meta{font-size:10px;color:var(--sub);margin-top:1px}
+.hist-del{padding:5px 8px;border-radius:7px;border:1px solid #e0c0c0;background:#fff8f8;color:#a03030;font-size:11px;cursor:pointer;font-family:inherit}
+
+.bottom-bar{position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1px solid var(--border);display:flex;gap:8px;padding:8px 10px;z-index:200;padding-bottom:max(8px,env(safe-area-inset-bottom))}
+.btn-main{flex:1;padding:12px;border-radius:10px;border:none;font-size:13px;font-weight:700;cursor:pointer;-webkit-appearance:none;font-family:inherit}
+.btn-save{background:var(--morado);color:#fff}
+.btn-csv{background:#fff;color:var(--morado);border:1.5px solid var(--morado)}
+.btn-main:active{opacity:.8;transform:scale(.97)}
+
+.toast{position:fixed;top:68px;left:50%;transform:translateX(-50%) translateY(-20px);background:#222;color:#fff;padding:8px 18px;border-radius:20px;font-size:13px;z-index:999;opacity:0;transition:all .3s;pointer-events:none;white-space:nowrap}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+.legend-row{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px}
+.leg{display:flex;align-items:center;gap:4px;font-size:10px;color:var(--sub)}
+.leg-box{width:18px;height:18px;border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700}
+
+.help-card{background:#eef0ff;border:1px solid #b0b8e8;border-radius:10px;padding:10px 12px;margin-bottom:10px;font-size:11px;color:#2d2d9e;line-height:1.5}
+</style>
+</head>
+<body>
+
+<div class="app-hdr">
+  <div class="hdr-row">
+    <div>
+      <h1>Ciclo de Servicio · SIEES 360</h1>
+      <p id="hdr-sub">Top Energy SLP · 18 Momentos de la Verdad</p>
+    </div>
+    <div class="score-pill">
+      <div class="num" id="hdr-score">—</div>
+      <div class="lbl">Score</div>
+    </div>
+  </div>
+</div>
+
+<div class="nav-tabs" id="nav">
+  <button class="nav-tab active" type="button" data-tab="0">Cluster</button>
+  <button class="nav-tab" type="button" data-tab="1">Cronómetro</button>
+  <button class="nav-tab" type="button" data-tab="2">F1 Llegada</button>
+  <button class="nav-tab" type="button" data-tab="3">F2 Despacho</button>
+  <button class="nav-tab" type="button" data-tab="4">F3 Pago</button>
+  <button class="nav-tab" type="button" data-tab="5">F4 Cierre</button>
+  <button class="nav-tab" type="button" data-tab="6">NPS</button>
+  <button class="nav-tab" type="button" data-tab="7">Evidencias</button>
+  <button class="nav-tab" type="button" data-tab="8">Resultado</button>
+  <button class="nav-tab" type="button" data-tab="9">Historial</button>
+</div>
+
+<!-- TAB 0: CLUSTER -->
+<div class="section active" id="tab0">
+
+  <div id="view-list">
+    <div class="cluster-intro">
+      <strong>Paso 1:</strong> Toca el cluster donde vas a evaluar. Cada cluster tiene <strong>3 estaciones</strong> a visitar: la Top Energy ⭐ y sus 2 competidores 🔵 más cercanos.
+    </div>
+    <div id="clusters-list"></div>
+  </div>
+
+  <div id="view-cluster" style="display:none">
+    <div class="cluster-detail">
+      <div class="cluster-detail-hdr">
+        <div class="cluster-detail-title" id="cluster-detail-title">Cluster</div>
+        <button class="btn-back" type="button" onclick="backToList()">← Volver</button>
+      </div>
+      <div class="cluster-instruction">
+        <strong>Paso 2:</strong> Toca la estación que vas a evaluar AHORA. Después de guardar, regresa aquí y evalúa las otras 2 del mismo cluster.
+      </div>
+      <div id="cluster-options"></div>
+    </div>
+  </div>
+
+  <div id="view-selected" style="display:none">
+    <div class="station-selected">
+      <div class="station-sel-row">
+        <div class="station-sel-icon" id="sel-icon">⭐</div>
+        <div class="station-sel-info">
+          <div class="station-sel-name" id="sel-name">—</div>
+          <div class="station-sel-addr" id="sel-addr">—</div>
+          <span class="station-sel-marca" id="sel-marca">—</span>
+        </div>
+        <button class="btn-back" type="button" onclick="changeStation()">Cambiar</button>
+      </div>
+      <a id="sel-maps" class="maps-btn" target="_blank" rel="noopener">📍 Cómo llegar</a>
+    </div>
+
+    <div class="form-card">
+      <div class="form-row">
+        <div>
+          <label class="form-lbl">Evaluador</label>
+          <select class="form-input" id="d-eval">
+            <option value="">— Seleccionar —</option>
+            <option>JFG — Coordinador</option>
+            <option>Evaluador A</option>
+            <option>Evaluador B</option>
+          </select>
+        </div>
+        <div>
+          <label class="form-lbl">Turno</label>
+          <select class="form-input" id="d-turno">
+            <option>Mañana (07–12h)</option>
+            <option>Tarde (12–18h)</option>
+            <option>Noche (18–22h)</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-row">
+        <div>
+          <label class="form-lbl">Fecha</label>
+          <input type="date" class="form-input" id="d-fecha">
+        </div>
+        <div>
+          <label class="form-lbl">Hora inicio</label>
+          <input type="time" class="form-input" id="d-hora">
+        </div>
+      </div>
+      <div class="form-row full">
+        <label class="form-lbl">Código evidencias (auto)</label>
+        <input type="text" class="form-input" id="d-codigo" style="font-family:monospace" readonly>
+      </div>
+      <div class="form-row full">
+        <label class="form-lbl">Observaciones de acceso / contexto inicial</label>
+        <textarea class="form-input" id="d-obs" rows="2" placeholder="Afluencia, clima, condiciones de acceso..."></textarea>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- TAB 1: CRONÓMETRO -->
+<div class="section" id="tab1">
+  <div class="help-card">Marca cada momento al instante en que ocurre. Los intervalos T1–T5 se calculan automáticamente.</div>
+  <div class="crono-card">
+    <div class="crono-hdr">⏱ Momentos cronometrados</div>
+    <div class="crono-grid">
+      <div class="crono-item">
+        <div class="crono-lbl">M2 · Ingreso a la E.S.</div>
+        <div class="crono-time" id="ct-m2">--:--:--</div>
+        <button class="crono-btn" type="button" id="cb-m2">Marcar M2</button>
+      </div>
+      <div class="crono-item">
+        <div class="crono-lbl">M3 · Llega al surtidor</div>
+        <div class="crono-time" id="ct-m3">--:--:--</div>
+        <button class="crono-btn" type="button" id="cb-m3">Marcar M3</button>
+      </div>
+      <div class="crono-item">
+        <div class="crono-lbl">M4 · Primer contacto</div>
+        <div class="crono-time" id="ct-m4">--:--:--</div>
+        <button class="crono-btn" type="button" id="cb-m4">Marcar M4</button>
+      </div>
+      <div class="crono-item">
+        <div class="crono-lbl">M5 · Inicio despacho</div>
+        <div class="crono-time" id="ct-m5">--:--:--</div>
+        <button class="crono-btn" type="button" id="cb-m5">Marcar M5</button>
+      </div>
+      <div class="crono-item" style="grid-column:1/-1;border-right:none">
+        <div class="crono-lbl">M16 · Despedida</div>
+        <div class="crono-time" id="ct-m16">--:--:--</div>
+        <button class="crono-btn" type="button" id="cb-m16">Marcar M16</button>
+      </div>
+    </div>
+    <div class="intervalos">
+      <div style="font-size:10px;font-weight:700;color:var(--sub);margin-bottom:6px;text-transform:uppercase">Intervalos calculados</div>
+      <div class="int-row"><span class="int-lbl">T1 Espera vialidad (M2→M3)</span><span class="int-val" id="t1-val">—</span></div>
+      <div class="int-row"><span class="int-lbl">T2 Fila (M3→M4)</span><span class="int-val" id="t2-val">—</span></div>
+      <div class="int-row"><span class="int-lbl">T3 Reacción (M4→M5)</span><span class="int-val" id="t3-val">—</span></div>
+      <div class="int-row"><span class="int-lbl">T4 Despacho (M5→M16)</span><span class="int-val" id="t4-val">—</span></div>
+      <div class="int-row" style="border-bottom:none"><span class="int-lbl" style="font-weight:700">T5 Ciclo total</span><span class="int-val" id="t5-val">—</span></div>
+    </div>
+  </div>
+  <button type="button" id="btn-reset-crono" style="width:100%;padding:10px;border-radius:10px;background:#fff;border:1.5px solid #e0c0c0;color:#a03030;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit">Reiniciar cronómetro</button>
+</div>
+
+<div class="section" id="tab2"><div id="fase1-content"></div></div>
+<div class="section" id="tab3"><div id="fase2-content"></div></div>
+<div class="section" id="tab4"><div id="fase3-content"></div></div>
+<div class="section" id="tab5"><div id="fase4-content"></div></div>
+
+<!-- TAB 6: NPS -->
+<div class="section" id="tab6">
+  <div class="nps-card">
+    <div class="nps-lbl">¿Qué tan probable es que recomiendes esta estación a un amigo o familiar?<br>
+    <span style="font-size:10px">(Escala del 0 al 10)</span></div>
+    <div class="nps-btns" id="nps-btns"></div>
+    <div class="nps-result" id="nps-result" style="display:none"></div>
+  </div>
+  <div class="form-card">
+    <label class="form-lbl">Observación general del servicio</label>
+    <textarea class="form-input" id="obs-general" rows="4" placeholder="Impresión general, aspectos destacados positivos o negativos..."></textarea>
+  </div>
+</div>
+
+<!-- TAB 7: EVIDENCIAS -->
+<div class="section" id="tab7">
+  <div style="background:var(--morado2);border-radius:12px;padding:12px 14px;margin-bottom:10px;color:#fff">
+    <div style="font-size:11px;opacity:.8;margin-bottom:4px">Código maestro de evidencias</div>
+    <div style="font-size:16px;font-weight:700;font-family:monospace;letter-spacing:.5px" id="ev-codigo-display">—</div>
+    <div style="font-size:10px;opacity:.7;margin-top:4px">Usa este código como prefijo en TODOS los archivos de esta visita</div>
+  </div>
+
+  <div class="ev-section">
+    <div class="ev-hdr" style="background:#0a1a3a">
+      <span class="ev-icon">🎥</span>
+      <span class="ev-title" style="color:#fff">Wolfbox i07 — Dashcam 3 canales</span>
+      <span class="ev-cam-badge cam-wolfbox">WOLFBOX</span>
+    </div>
+    <div class="ev-body">
+      <div style="font-size:10px;color:var(--sub);margin-bottom:8px;line-height:1.5">Grabación continua automática en 3 canales simultáneos.</div>
+      <div class="ev-step"><div class="ev-step-num">F</div><div class="ev-step-txt"><strong>Frontal</strong> — Vista desde el parabrisas (lo que el conductor ve)</div></div>
+      <div class="ev-step"><div class="ev-step-num">R</div><div class="ev-step-txt"><strong>Posterior</strong> — Cámara en el medallón trasero</div></div>
+      <div class="ev-step"><div class="ev-step-num">I</div><div class="ev-step-txt"><strong>Interior</strong> — Captura la cabina, algo de la interacción con el despachador</div></div>
+      <div style="font-size:10px;font-weight:700;color:var(--sub);margin:8px 0 4px">Nomenclatura al descargar:</div>
+      <div class="ev-code" id="ev-wolfbox-code">—</div>
+    </div>
+  </div>
+
+  <div class="ev-section">
+    <div class="ev-hdr" style="background:#0a2a0a">
+      <span class="ev-icon">📸</span>
+      <span class="ev-title" style="color:#fff">GoPro Hero 4K — Ventanilla conductor</span>
+      <span class="ev-cam-badge cam-gopro">GOPRO</span>
+    </div>
+    <div class="ev-body">
+      <div style="font-size:10px;color:var(--sub);margin-bottom:8px;line-height:1.5">Sobre parabrisas interior lado copiloto, apuntando a ventanilla del conductor. Captura diálogos.</div>
+      <div style="font-size:10px;font-weight:700;color:var(--sub);margin:8px 0 4px">Nomenclatura:</div>
+      <div class="ev-code" id="ev-gopro-code">—</div>
+      <label class="form-lbl">Clips GoPro generados</label>
+      <input type="text" class="ev-input" id="ev-gopro-clips" placeholder="Ej: 1 clip de 5 min">
+    </div>
+  </div>
+
+  <div class="ev-section">
+    <div class="ev-hdr" style="background:#0a0a3a">
+      <span class="ev-icon">👓</span>
+      <span class="ev-title" style="color:#fff">Lentes HeyCyan — Recorrido a pie</span>
+      <span class="ev-cam-badge cam-hc">HEYCYAN</span>
+    </div>
+    <div class="ev-body">
+      <div style="font-size:10px;color:var(--sub);margin-bottom:8px;line-height:1.5">Para recorrido ISAT a pie (servicios complementarios, baños, tienda).</div>
+      <div class="ev-code" id="ev-hc-code">—</div>
+      <label class="form-lbl">Nota HeyCyan al finalizar</label>
+      <input type="text" class="ev-input" id="ev-hc-nota" placeholder="ISAT:74 T1:82 T2:68 | JFG M">
+    </div>
+  </div>
+
+  <div style="background:#eaf3de;border:1.5px solid #70b040;border-radius:12px;padding:12px 14px;margin-bottom:10px">
+    <div style="font-size:11px;font-weight:700;color:#2d6a2d;margin-bottom:6px">✓ Resumen de archivos a guardar</div>
+    <div style="font-size:10px;color:#3a5a20;line-height:1.7" id="ev-summary">—</div>
+  </div>
+</div>
+
+<!-- TAB 8: RESULTADO -->
+<div class="section" id="tab8">
+  <div class="result-box" id="result-box" style="background:#f0f4ff;border-color:#b0c0e0">
+    <div class="result-big" id="r-big" style="color:var(--morado)">—</div>
+    <div class="result-lbl">Score SIEES 360 / 100</div>
+    <div class="result-nivel" id="r-nivel">—</div>
+  </div>
+  <div style="background:var(--card);border-radius:12px;border:1px solid var(--border);padding:12px;margin-bottom:10px">
+    <div style="font-size:11px;font-weight:700;color:var(--sub);margin-bottom:8px;text-transform:uppercase">Desglose por fase</div>
+    <div class="tier-grid">
+      <div class="tier-card" style="background:#e8f0ff"><div class="tn" style="color:#2040a0" id="r-f1">—</div><div class="tl" style="color:#2040a0">F1 Llegada</div></div>
+      <div class="tier-card" style="background:#fff3e8"><div class="tn" style="color:#904010" id="r-f2">—</div><div class="tl" style="color:#904010">F2 Despacho</div></div>
+      <div class="tier-card" style="background:#e8ffe8"><div class="tn" style="color:#105010" id="r-f3">—</div><div class="tl" style="color:#105010">F3 Pago</div></div>
+      <div class="tier-card" style="background:#ffe8ff"><div class="tn" style="color:#601060" id="r-f4">—</div><div class="tl" style="color:#601060">F4 Cierre</div></div>
+    </div>
+  </div>
+  <div class="result-box" id="r-nota" style="font-size:12px;line-height:1.5;text-align:left;background:#f8f9ff">—</div>
+</div>
+
+<!-- TAB 9: HISTORIAL -->
+<div class="section" id="tab9">
+  <div style="background:var(--card);border-radius:12px;border:1px solid var(--border);overflow:hidden;margin-bottom:10px">
+    <div style="padding:10px 12px;display:flex;justify-content:space-between;align-items:center">
+      <span style="font-size:12px;font-weight:700">Visitas guardadas</span>
+      <span style="font-size:11px;color:var(--sub)" id="hist-count">0 visitas</span>
+    </div>
+    <div id="hist-list"><div style="padding:16px;font-size:13px;color:var(--sub);text-align:center">Sin registros aún</div></div>
+  </div>
+  <button type="button" id="btn-export" style="width:100%;padding:12px;border-radius:10px;background:#fff;border:1.5px solid var(--morado);color:var(--morado);font-size:13px;font-weight:700;cursor:pointer;margin-bottom:8px;font-family:inherit">⬇ Exportar todo a CSV</button>
+  <button type="button" id="btn-clear" style="width:100%;padding:10px;border-radius:10px;background:#fff;border:1.5px solid #e0c0c0;color:#a03030;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit">Limpiar registros</button>
+</div>
+
+<div class="bottom-bar">
+  <button class="btn-main btn-save" type="button" id="btn-save">💾 Guardar visita</button>
+  <button class="btn-main btn-csv" type="button" id="btn-csv-quick">⬇ CSV</button>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const CATALOG=[{"no": 1, "name": "Alamitos", "mun": "San Luis Potosí", "addr": "Av. Santos Degollado #403, Alamitos, CP 78280", "ca_name": "GAZPRO", "ca_marca": "Otras (CRE)", "ca_dir": "Por confirmar — cerca de Alamitos", "cb_name": "SERVICIO TATANACHO", "cb_marca": "Otras (CRE)", "cb_dir": "Por confirmar — cerca de Alamitos"}, {"no": 2, "name": "B. Anaya", "mun": "San Luis Potosí", "addr": "Av. Ricardo B Anaya 1901, Rinc. de B Anaya", "ca_name": "SÚPER SERVICIO ABASTOS", "ca_marca": "Otras (CRE)", "ca_dir": "Por confirmar — cerca de B. Anaya", "cb_name": "GAZPRO", "cb_marca": "Mobil", "cb_dir": "Carretera Central Km. 420, Zona Industrial, CP 78399"}, {"no": 3, "name": "Central", "mun": "San Luis Potosí", "addr": "Av. Dr. Salvador Nava Martínez 100, El Paseo, CP 78320", "ca_name": "HIDROSINA PLUS", "ca_marca": "Hidrosina", "ca_dir": "Por confirmar — cerca de Central", "cb_name": "SERVICIO ESMERALDA", "cb_marca": "Otras (CRE)", "cb_dir": "Por confirmar — cerca de Central"}, {"no": 4, "name": "Chapultepec", "mun": "San Luis Potosí", "addr": "Av. Chapultepec 1090, Col. Colinas del Parque, CP 78260", "ca_name": "CORPOE,  (E.S. Mobil Lomas)", "ca_marca": "Mobil", "ca_dir": "Blvd. Antonio Rocha Cordero 357, Desarrollo del Pedregal, CP 78295", "cb_name": "COSTCO GAS,  (E.S. Costco)", "cb_marca": "Costco", "cb_dir": "Junto a Costco Wholesale / Plaza Citadella, zona Tangamanga"}, {"no": 5, "name": "Ducati", "mun": "San Luis Potosí", "addr": "Blvd. Manuel Gómez Morín No. 880, Fracc. Villa Magna, CP 78183", "ca_name": "CORPOE", "ca_marca": "Mobil", "ca_dir": "Av. Morales Saucito No. 2425, Fracc. La Loma, CP 78150", "cb_name": "JESÚS MANUEL TENOCH GONZÁLEZ MARTINEZ", "cb_marca": "Gasomax", "cb_dir": "Por confirmar — cerca de Ducati"}, {"no": 6, "name": "Glorieta", "mun": "San Luis Potosí", "addr": "Carr. México-Piedras Negras No. 91, Col. San Luis, CP 78310", "ca_name": "SERVICIO RELAMPAGO", "ca_marca": "Gasomax", "ca_dir": "Artículo 123 #100, Col. El Polvorín, CP 78436", "cb_name": "SERVICIO VALENTIN AMADOR", "cb_marca": "Gulf", "cb_dir": "Por confirmar — cerca de Glorieta"}, {"no": 7, "name": "Himno", "mun": "San Luis Potosí", "addr": "Av. Himno Nacional No. 2187, Jardines del Estadio, CP 78280", "ca_name": "SERVICIO TATANACHO", "ca_marca": "Otras (CRE)", "ca_dir": "Por confirmar — cerca de Himno", "cb_name": "SÚPER SERVICIO CLOUTHIER", "cb_marca": "Mobil", "cb_dir": "Av. Himno Nacional 1901, Fracc. Tangamanga, CP 78269"}, {"no": 8, "name": "La Feria", "mun": "San Luis Potosí", "addr": "Blvd. Antonio Rocha Cordero 104, La Pedrera, CP 78405", "ca_name": "GASOLINERAS ASOCIADAS POTOSINAS", "ca_marca": "Otras (CRE)", "ca_dir": "Por confirmar — cerca de La Feria", "cb_name": "GASOLINERA PERISUR", "cb_marca": "Otras (CRE)", "cb_dir": "Por confirmar — cerca de La Feria"}, {"no": 9, "name": "Las Lomas", "mun": "San Luis Potosí", "addr": "Av. Eugenio Garza Sada 101, Lomas del Tecnológico, CP 78216", "ca_name": "ULTRA SERVICIO LOMAS", "ca_marca": "Otras (CRE)", "ca_dir": "Por confirmar — cerca de Las Lomas", "cb_name": "SERVICIO SIERRA VISTA", "cb_marca": "Gasolider", "cb_dir": "Blvd. Antonio Rocha Cordero 720, Las Haciendas, CP 78418"}, {"no": 10, "name": "Los Globos", "mun": "Soledad", "addr": "Av. Soledad Km 5 S/N, Col. San Felipe, CP 78433", "ca_name": "SERVICIO ACCESO NORTE", "ca_marca": "Otras (CRE)", "ca_dir": "Por confirmar — cerca de Los Globos", "cb_name": "GAZPRO", "cb_marca": "Mobil", "cb_dir": "Acceso Norte 441, Fracc. San Antonio, CP 78309"}, {"no": 11, "name": "Morales", "mun": "San Luis Potosí", "addr": "Av. Morales Saucito No. 1800, Fracc. Mezquital, CP 78130", "ca_name": "CORPOE", "ca_marca": "Mobil", "ca_dir": "Av. Morales Saucito No. 2425, Fracc. La Loma, CP 78150", "cb_name": "SÚPER ESTACIÓN DE ALBA", "cb_marca": "Mobil", "cb_dir": "Prol. Muñoz #401, Muñoz 1ra Sección, CP 78165"}, {"no": 12, "name": "Polanco", "mun": "San Luis Potosí", "addr": "Av. Nereo Rodríguez Barragán Núm. 1342, Col. Polanco", "ca_name": "CORPOE", "ca_marca": "Mobil", "ca_dir": "Nereo Rodríguez Barragán 450, Col. del Valle, CP 78200", "cb_name": "GASOLINERA DORADO", "cb_marca": "Gasomax", "cb_dir": "Capitán Caldera #10, Col. Fuentes del Bosque, CP 78200"}, {"no": 13, "name": "Pozos A", "mun": "Villa de Pozos", "addr": "Carr. Central SLP-Querétaro Km 189-0, CP 78421", "ca_name": "COMSERPO", "ca_marca": "Otras (CRE)", "ca_dir": "Por confirmar — cerca de Pozos A", "cb_name": "MULTISERVICIOS TULA 2000", "cb_marca": "Otras (CRE)", "cb_dir": "Por confirmar — cerca de Pozos A"}, {"no": 14, "name": "Pozos B", "mun": "Villa de Pozos", "addr": "Carr. Qro-SLP KM 189, Villa de Pozos, CP 78421", "ca_name": "COMSERPO", "ca_marca": "Otras (CRE)", "ca_dir": "Por confirmar — cerca de Pozos B", "cb_name": "MULTISERVICIOS TULA 2000", "cb_marca": "Otras (CRE)", "cb_dir": "Por confirmar — cerca de Pozos B"}, {"no": 15, "name": "Reforma", "mun": "San Luis Potosí", "addr": "Reforma No. 1153, Col. Centro, CP 78000", "ca_name": "GAZPRO", "ca_marca": "Otras (CRE)", "ca_dir": "Por confirmar — cerca de Reforma", "cb_name": "ULTRA SERVICIO ALAMEDA", "cb_marca": "Mobil", "cb_dir": "Manuel José Othón 485, Col. Centro, CP 78000"}, {"no": 16, "name": "Salk 1", "mun": "San Luis Potosí", "addr": "Av. Salk No. 113, Col. Las Pilitas, CP 78379", "ca_name": "Futurgas", "ca_marca": "Otras (CRE)", "ca_dir": "Por confirmar — cerca de Salk 1", "cb_name": "HIDROSINA PLUS", "cb_marca": "Otras (CRE)", "cb_dir": "Por confirmar — cerca de Salk 1"}, {"no": 17, "name": "Salk 2", "mun": "San Luis Potosí", "addr": "Blvd. Antonio Rocha Cordero No. 1085, Fracc. Salk, CP 78385", "ca_name": "GASOLINERA PERISUR", "ca_marca": "Otras (CRE)", "ca_dir": "Por confirmar — cerca de Salk 2", "cb_name": "EXPRESS GAS", "cb_marca": "Gasomax", "cb_dir": "Libramiento Oriente 2055, Col. Juan Sarabia, CP 78395"}, {"no": 18, "name": "Satélite", "mun": "Villa de Pozos", "addr": "Av. San Nicolás de los Jassos No. 10, Cd. Satélite, CP 78423", "ca_name": "MARCO ANTONIO FONSECA MARQUEZ", "ca_marca": "Otras (CRE)", "ca_dir": "Por confirmar — cerca de Satélite", "cb_name": "Operadora de Franquicias Dineek", "cb_marca": "Otras (CRE)", "cb_dir": "Por confirmar — cerca de Satélite"}, {"no": 19, "name": "Soledad 1", "mun": "Soledad", "addr": "Av. San Pedro No. 1601, Col. San Francisco, CP 78437", "ca_name": "AGENCIA DE COMB. Y LUB EL MORRO", "ca_marca": "Otras (CRE)", "ca_dir": "Por confirmar — cerca de Soledad 1", "cb_name": "EXPRESS PERICO", "cb_marca": "Otras (CRE)", "cb_dir": "Por confirmar — cerca de Soledad 1"}, {"no": 20, "name": "Soledad 2", "mun": "Soledad", "addr": "Carr. Matehuala No. 4632-1, Col. Cuartel 3°, CP 78430", "ca_name": "SUANA", "ca_marca": "Otras (CRE)", "ca_dir": "Por confirmar — cerca de Soledad 2", "cb_name": "GASO PRODUCTOS PERIFÉRICO ORIENTE", "cb_marca": "Otras (CRE)", "cb_dir": "Por confirmar — cerca de Soledad 2"}, {"no": 21, "name": "Villa Magna", "mun": "San Luis Potosí", "addr": "Av. Villa Magna Sur esq. Blvd. M. Gómez Morín LT 45, CP 78183", "ca_name": "CORPOE", "ca_marca": "Mobil", "ca_dir": "Av. Morales Saucito No. 2425, Fracc. La Loma, CP 78150", "cb_name": "JESÚS MANUEL TENOCH GONZÁLEZ MARTINEZ", "cb_marca": "Gasomax", "cb_dir": "Por confirmar — cerca de Villa Magna"}];
+
+var MOMENTOS = [
+  {id:"M01",fase:1,title:"Acceso y señalización exterior",crit:"Medio",desc:"Visibilidad de marca, señalización de entrada, facilidad de acceso vehicular."},
+  {id:"M02",fase:1,title:"Ingreso al patio",crit:"Medio",desc:"Fluidez del acceso, demarcación de carriles."},
+  {id:"M03",fase:1,title:"Tiempo de espera en cola",crit:"ALTO",desc:"Tiempo desde llegar al surtidor hasta ser atendido. Crítico: >3 min."},
+  {id:"M04",fase:1,title:"Saludo y primer contacto visual",crit:"ALTO",desc:"¿Se acerca activamente? ¿Saluda? ¿Actitud de servicio?"},
+  {id:"M05",fase:2,title:"Toma de solicitud (tipo, cantidad, pago)",crit:"ALTO",desc:"¿Confirma el tipo de combustible, cantidad y forma de pago?"},
+  {id:"M06",fase:2,title:"Protocolo de seguridad",crit:"ALTO",desc:"¿Solicita apagar motor? ¿Menciona celular?"},
+  {id:"M07",fase:2,title:"Verificación del cero",crit:"ALTO",peak:true,desc:"PICO EMOCIONAL. ¿Muestra el surtidor en cero proactivamente?"},
+  {id:"M08",fase:2,title:"Inicio del despacho",crit:"Medio",desc:"Postura, actitud, uso de guantes, cuidado de carrocería."},
+  {id:"M09",fase:2,title:"Oferta servicios adicionales",crit:"Medio",desc:"¿Ofrece revisar aceite, agua, llantas, limpieza parabrisas?"},
+  {id:"M10",fase:2,title:"Actitud durante despacho",crit:"Medio",desc:"¿Mantiene atención al cliente? ¿Evita celular?"},
+  {id:"M11",fase:2,title:"Presentación del despachador",crit:"Medio",desc:"Uniforme, gafete, higiene personal."},
+  {id:"M12",fase:2,title:"Aviso de fin de despacho",crit:"Medio",desc:"¿Avisa verbalmente? ¿Extrae pistola con cuidado?"},
+  {id:"M13",fase:3,title:"Proceso de cobro y manejo efectivo",crit:"ALTO",desc:"¿Cambio correcto? ¿Lo cuenta frente al cliente?"},
+  {id:"M14",fase:3,title:"Medios de pago alternativos",crit:"Medio",desc:"Terminal operativa, vales, facturación electrónica."},
+  {id:"M15",fase:3,title:"Oferta de ticket/factura",crit:"Medio",desc:"¿Se ofrece proactivamente?"},
+  {id:"M16",fase:4,title:"Despedida y agradecimiento",crit:"ALTO",final:true,desc:"FINAL. ¿Despedida genuina? ¿Invitación a regresar?"},
+  {id:"M17",fase:4,title:"Salida ordenada",crit:"Bajo",desc:"Señalización de salida, ausencia de congestión."},
+  {id:"M18",fase:4,title:"Evaluación post-servicio",crit:"ALTO",desc:"Confianza en litros, valoración global, decisión de regresar."}
+];
+
+var FASES = [
+  {n:1,id:"fase1-content",title:"F1 · Llegada y primer contacto",desc:"M01–M04",cls:"f1"},
+  {n:2,id:"fase2-content",title:"F2 · Despacho de combustible",desc:"M05–M12",cls:"f2"},
+  {n:3,id:"fase3-content",title:"F3 · Cobro y transacción",desc:"M13–M15",cls:"f3"},
+  {n:4,id:"fase4-content",title:"F4 · Cierre y despedida",desc:"M16–M18",cls:"f4"}
+];
+
+var currentCluster = null;
+var currentStation = null;
+var scores = {};
+MOMENTOS.forEach(function(m){scores[m.id]=null;});
+var npsVal = null;
+var tiempos = {m2:null,m3:null,m4:null,m5:null,m16:null};
+
+function showToast(msg){
+  var t = document.getElementById("toast");
+  t.textContent = msg;
+  t.classList.add("show");
+  setTimeout(function(){t.classList.remove("show");}, 2200);
+}
+
+// ── BUILD CLUSTERS LIST ─────────────────────────────────────────
+function buildClustersList(){
+  var cont = document.getElementById("clusters-list");
+  var html = "";
+  CATALOG.forEach(function(c){
+    var num = String(c.no).padStart(2,"0");
+    html += "<div class=\"cluster-list-item\" onclick=\"selectCluster("+c.no+")\">"+
+      "<div class=\"cluster-list-hdr\">"+
+        "<span class=\"cluster-num\">G"+num+"</span>"+
+        "<div style=\"flex:1\">"+
+          "<div class=\"cluster-name\">⭐ "+escapeHtml(c.name)+"</div>"+
+          "<div class=\"cluster-mun\">"+escapeHtml(c.mun)+"</div>"+
+        "</div>"+
+        "<span class=\"cluster-arrow\">›</span>"+
+      "</div>"+
+    "</div>";
+  });
+  cont.innerHTML = html;
+}
+
+function escapeHtml(s){
+  if(!s) return "";
+  return String(s).replace(/[&<>"\']/g, function(c){
+    return {"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","\'":"&#39;"}[c];
+  });
+}
+
+// ── SELECT CLUSTER ──────────────────────────────────────────────
+function selectCluster(no){
+  var c = CATALOG[no-1];
+  if(!c) return;
+  currentCluster = c;
+  var num = String(c.no).padStart(2,"0");
+  document.getElementById("cluster-detail-title").textContent = "Cluster G"+num+" — "+c.name;
+  
+  var html = "";
+  // TE
+  html += "<div class=\"station-option te\" onclick=\"selectStation('TE')\">"+
+    "<div class=\"station-opt-top\">"+
+      "<span class=\"station-opt-icon\">⭐</span>"+
+      "<span class=\"station-opt-code\">TE-"+num+"</span>"+
+      "<span class=\"station-opt-name\">"+escapeHtml(c.name)+"</span>"+
+      "<span class=\"station-opt-marca\">Top Energy</span>"+
+    "</div>"+
+    "<div class=\"station-opt-addr\">"+escapeHtml(c.addr)+"</div>"+
+    "<a class=\"maps-btn\" target=\"_blank\" rel=\"noopener\" href=\"https://www.google.com/maps/search/?api=1&query="+encodeURIComponent(c.addr+" "+c.mun)+"\" onclick=\"event.stopPropagation()\">📍 Cómo llegar</a>"+
+  "</div>";
+  // CA
+  html += "<div class=\"station-option comp\" onclick=\"selectStation('CA')\">"+
+    "<div class=\"station-opt-top\">"+
+      "<span class=\"station-opt-icon\">🔵</span>"+
+      "<span class=\"station-opt-code\">CA-"+num+"</span>"+
+      "<span class=\"station-opt-name\">"+escapeHtml(c.ca_name)+"</span>"+
+      "<span class=\"station-opt-marca\">"+escapeHtml(c.ca_marca)+"</span>"+
+    "</div>"+
+    "<div class=\"station-opt-addr\">"+escapeHtml(c.ca_dir||"Por confirmar")+"</div>"+
+    "<a class=\"maps-btn\" target=\"_blank\" rel=\"noopener\" href=\"https://www.google.com/maps/search/?api=1&query="+encodeURIComponent((c.ca_dir||c.ca_name)+" "+c.mun)+"\" onclick=\"event.stopPropagation()\">📍 Cómo llegar</a>"+
+  "</div>";
+  // CB
+  html += "<div class=\"station-option comp\" onclick=\"selectStation('CB')\">"+
+    "<div class=\"station-opt-top\">"+
+      "<span class=\"station-opt-icon\">🔵</span>"+
+      "<span class=\"station-opt-code\">CB-"+num+"</span>"+
+      "<span class=\"station-opt-name\">"+escapeHtml(c.cb_name)+"</span>"+
+      "<span class=\"station-opt-marca\">"+escapeHtml(c.cb_marca)+"</span>"+
+    "</div>"+
+    "<div class=\"station-opt-addr\">"+escapeHtml(c.cb_dir||"Por confirmar")+"</div>"+
+    "<a class=\"maps-btn\" target=\"_blank\" rel=\"noopener\" href=\"https://www.google.com/maps/search/?api=1&query="+encodeURIComponent((c.cb_dir||c.cb_name)+" "+c.mun)+"\" onclick=\"event.stopPropagation()\">📍 Cómo llegar</a>"+
+  "</div>";
+  
+  document.getElementById("cluster-options").innerHTML = html;
+  document.getElementById("view-list").style.display = "none";
+  document.getElementById("view-cluster").style.display = "block";
+  document.getElementById("view-selected").style.display = "none";
+}
+
+function backToList(){
+  document.getElementById("view-cluster").style.display = "none";
+  document.getElementById("view-list").style.display = "block";
+}
+
+// ── SELECT STATION ─────────────────────────────────────────────
+function selectStation(tipo){
+  if(!currentCluster) return;
+  var c = currentCluster;
+  var num = String(c.no).padStart(2,"0");
+  var clave, name, marca, addr, icon;
+  if(tipo==="TE"){
+    clave = "TE-"+num; name = c.name; marca = "Top Energy"; addr = c.addr; icon = "⭐";
+  } else if(tipo==="CA"){
+    clave = "CA-"+num; name = c.ca_name; marca = c.ca_marca; addr = c.ca_dir||"Por confirmar"; icon = "🔵";
+  } else {
+    clave = "CB-"+num; name = c.cb_name; marca = c.cb_marca; addr = c.cb_dir||"Por confirmar"; icon = "🔵";
+  }
+  currentStation = {clave:clave, tipo:tipo, no:c.no, name:name, marca:marca, addr:addr, mun:c.mun};
+  
+  document.getElementById("sel-icon").textContent = icon;
+  document.getElementById("sel-name").textContent = clave+" · "+name;
+  document.getElementById("sel-addr").textContent = addr;
+  var marcaEl = document.getElementById("sel-marca");
+  marcaEl.textContent = marca;
+  marcaEl.style.background = tipo==="TE" ? "var(--te-bg)" : "var(--comp-bg)";
+  marcaEl.style.color = tipo==="TE" ? "var(--te-c)" : "var(--comp-c)";
+  document.getElementById("sel-maps").href = "https://www.google.com/maps/search/?api=1&query="+encodeURIComponent(addr+" "+c.mun);
+  
+  document.getElementById("hdr-sub").textContent = clave+" · "+name;
+  document.getElementById("view-cluster").style.display = "none";
+  document.getElementById("view-selected").style.display = "block";
+  updateCodigo();
+}
+
+function changeStation(){
+  document.getElementById("view-selected").style.display = "none";
+  document.getElementById("view-cluster").style.display = "block";
+}
+
+// ── CÓDIGO EVIDENCIAS ──────────────────────────────────────────
+function updateCodigo(){
+  if(!currentStation) return;
+  var fecha = (document.getElementById("d-fecha").value||"").replace(/-/g,"");
+  var turno = "M";
+  var t = document.getElementById("d-turno").value;
+  if(t.indexOf("Tarde")>=0) turno = "T";
+  else if(t.indexOf("Noche")>=0) turno = "N";
+  var code = currentStation.clave+"_"+fecha+"_"+turno;
+  document.getElementById("d-codigo").value = code;
+  document.getElementById("ev-codigo-display").textContent = code;
+  document.getElementById("ev-wolfbox-code").innerHTML = code+"_WBX-F.mp4<br>"+code+"_WBX-R.mp4<br>"+code+"_WBX-I.mp4";
+  document.getElementById("ev-gopro-code").textContent = code+"_GP-001.mp4";
+  document.getElementById("ev-hc-code").textContent = code;
+  document.getElementById("ev-summary").innerHTML = 
+    "Wolfbox: <span style=\"font-family:monospace\">"+code+"_WBX-[F/R/I].mp4</span><br>"+
+    "GoPro: <span style=\"font-family:monospace\">"+code+"_GP-001.mp4</span><br>"+
+    "HeyCyan: <span style=\"font-family:monospace\">"+code+"/</span>";
+}
+
+// ── BUILD MOMENTOS ─────────────────────────────────────────────
+function buildMomentos(){
+  FASES.forEach(function(fi){
+    var cont = document.getElementById(fi.id);
+    var moms = MOMENTOS.filter(function(m){return m.fase===fi.n;});
+    var html = "<div class=\"fase-banner "+fi.cls+"\">"+
+      "<span class=\"fase-num\">"+fi.title.split("·")[0].trim()+"</span>"+
+      "<span class=\"fase-title\">"+fi.title.split("·")[1].trim()+" <span style=\"font-size:10px;font-weight:400\">"+fi.desc+"</span></span>"+
+    "</div>"+
+    "<div class=\"legend-row\">"+
+      "<span class=\"leg\"><span class=\"leg-box\" style=\"background:#fcebeb;color:#8a1f1f;border:1px solid #d07070\">0</span>No cumple</span>"+
+      "<span class=\"leg\"><span class=\"leg-box\" style=\"background:#fff3e0;color:#7a4b00;border:1px solid #c08030\">1</span>Parcial</span>"+
+      "<span class=\"leg\"><span class=\"leg-box\" style=\"background:#e8f4e8;color:#1f5c1f;border:1px solid #60a060\">2</span>Cumple</span>"+
+      "<span class=\"leg\"><span class=\"leg-box\" style=\"background:#e8e8ff;color:#2d2d9e;border:1px solid #7070c0\">3</span>Excelente</span>"+
+    "</div>";
+    moms.forEach(function(m){
+      var critCls = m.crit==="ALTO"?"crit-alto":m.crit==="Medio"?"crit-med":"crit-bajo";
+      var peakTag = m.peak ? "<span class=\"peak-tag\">PICO</span>" : "";
+      var finalTag = m.final ? "<span class=\"final-tag\">FINAL</span>" : "";
+      html += "<div class=\"momento-card\">"+
+        "<div class=\"momento-hdr\">"+
+          "<span class=\"momento-num "+critCls+"\">"+m.id+"</span>"+
+          "<span class=\"momento-title\">"+escapeHtml(m.title)+peakTag+finalTag+"</span>"+
+          "<span class=\"momento-score-display\" id=\"sd-"+m.id+"\" style=\"color:var(--sub)\">—</span>"+
+        "</div>"+
+        "<div style=\"padding:0 12px 6px;font-size:10px;color:var(--sub);line-height:1.4\">"+escapeHtml(m.desc)+"</div>"+
+        "<div class=\"score-row\">"+
+          "<button class=\"sc s0\" type=\"button\" id=\"sc-"+m.id+"-0\" onclick=\"setScore('"+m.id+"',0)\">0</button>"+
+          "<button class=\"sc s1\" type=\"button\" id=\"sc-"+m.id+"-1\" onclick=\"setScore('"+m.id+"',1)\">1</button>"+
+          "<button class=\"sc s2\" type=\"button\" id=\"sc-"+m.id+"-2\" onclick=\"setScore('"+m.id+"',2)\">2</button>"+
+          "<button class=\"sc s3\" type=\"button\" id=\"sc-"+m.id+"-3\" onclick=\"setScore('"+m.id+"',3)\">3</button>"+
+          "<button class=\"sc-na\" type=\"button\" id=\"sc-"+m.id+"-na\" onclick=\"setNA('"+m.id+"')\">N/A</button>"+
+        "</div>"+
+        "<textarea class=\"momento-obs\" id=\"obs-"+m.id+"\" rows=\"2\" placeholder=\"Observación "+m.id+"...\"></textarea>"+
+      "</div>";
+    });
+    cont.innerHTML = html;
+  });
+}
+
+function setScore(id, val){
+  scores[id] = val;
+  for(var v=0; v<=3; v++){
+    var el = document.getElementById("sc-"+id+"-"+v);
+    if(el) el.className = "sc s"+v+(v===val?" sel":"");
+  }
+  var na = document.getElementById("sc-"+id+"-na");
+  if(na) na.className = "sc-na";
+  var sd = document.getElementById("sd-"+id);
+  if(sd){
+    sd.textContent = val;
+    sd.style.color = val>=2 ? "#1f5c1f" : val===1 ? "#7a4b00" : "#8a1f1f";
+  }
+  recalc();
+}
+
+function setNA(id){
+  scores[id] = "na";
+  for(var v=0; v<=3; v++){
+    var el = document.getElementById("sc-"+id+"-"+v);
+    if(el) el.className = "sc s"+v;
+  }
+  document.getElementById("sc-"+id+"-na").className = "sc-na sel";
+  var sd = document.getElementById("sd-"+id);
+  if(sd){ sd.textContent = "N/A"; sd.style.color = "var(--sub)"; }
+  recalc();
+}
+
+// ── CRONÓMETRO ─────────────────────────────────────────────────
+function markTime(key){
+  var now = new Date();
+  tiempos[key] = now;
+  var hms = now.toTimeString().slice(0,8);
+  document.getElementById("ct-"+key).textContent = hms;
+  var btn = document.getElementById("cb-"+key);
+  btn.textContent = "✓ "+hms.slice(0,5);
+  btn.className = "crono-btn marcado";
+  calcIntervalos();
+}
+
+function calcIntervalos(){
+  function diff(a,b){ if(!a||!b) return null; return Math.round((b-a)/1000); }
+  function fmt(s){
+    if(s===null) return "—";
+    var m = Math.floor(s/60);
+    var sec = s%60;
+    return (m>0?m+"'":"") + sec + "\"";
+  }
+  document.getElementById("t1-val").textContent = fmt(diff(tiempos.m2,tiempos.m3));
+  document.getElementById("t2-val").textContent = fmt(diff(tiempos.m3,tiempos.m4));
+  document.getElementById("t3-val").textContent = fmt(diff(tiempos.m4,tiempos.m5));
+  document.getElementById("t4-val").textContent = fmt(diff(tiempos.m5,tiempos.m16));
+  document.getElementById("t5-val").textContent = fmt(diff(tiempos.m2,tiempos.m16));
+}
+
+function resetCrono(){
+  if(!confirm("¿Reiniciar cronómetro?")) return;
+  tiempos = {m2:null,m3:null,m4:null,m5:null,m16:null};
+  ["m2","m3","m4","m5","m16"].forEach(function(k){
+    document.getElementById("ct-"+k).textContent = "--:--:--";
+    var btn = document.getElementById("cb-"+k);
+    btn.textContent = "Marcar "+k.toUpperCase();
+    btn.className = "crono-btn";
+  });
+  ["t1","t2","t3","t4","t5"].forEach(function(k){
+    document.getElementById(k+"-val").textContent = "—";
+  });
+}
+
+// ── RECALC ─────────────────────────────────────────────────────
+function recalc(){
+  var total = 0, totMax = 0;
+  var faseScores = {1:{s:0,m:0},2:{s:0,m:0},3:{s:0,m:0},4:{s:0,m:0}};
+  MOMENTOS.forEach(function(m){
+    var v = scores[m.id];
+    var w = m.crit==="ALTO" ? 3 : m.crit==="Medio" ? 2 : 1;
+    if(v!==null && v!=="na"){
+      faseScores[m.fase].s += v/3*w;
+      faseScores[m.fase].m += w;
+      total += v/3*w;
+      totMax += w;
+    } else if(v===null){
+      faseScores[m.fase].m += w;
+      totMax += w;
+    }
+  });
+  var pct = totMax>0 ? Math.round(total/totMax*100) : 0;
+  document.getElementById("hdr-score").textContent = pct||"—";
+  document.getElementById("r-big").textContent = pct||"—";
+  for(var f=1; f<=4; f++){
+    var fs = faseScores[f];
+    var fp = fs.m>0 ? Math.round(fs.s/fs.m*100) : 0;
+    document.getElementById("r-f"+f).textContent = fp||"—";
+  }
+  var nivel, nota, bg, tc;
+  if(pct>=85){nivel="Excelente";nota="Servicio de referencia. Peak-End positivo confirmado.";bg="#e8f4e8";tc="#1f5c1f";}
+  else if(pct>=70){nivel="Bueno";nota="Buen nivel con oportunidades de mejora.";bg="#e8e8ff";tc="#2d2d9e";}
+  else if(pct>=55){nivel="Regular";nota="Servicio aceptable pero inconsistente.";bg="#fff3e8";tc="#904010";}
+  else if(pct>=40){nivel="Deficiente";nota="Fallas significativas en el ciclo.";bg="#fff0f0";tc="#8a1f1f";}
+  else{nivel="Crítico";nota="Fallas graves. Requiere intervención.";bg="#fcebeb";tc="#8a1f1f";}
+  var rb = document.getElementById("result-box");
+  var rn = document.getElementById("r-nivel");
+  var rnota = document.getElementById("r-nota");
+  if(rb){rb.style.background=bg; rb.style.borderColor=tc;}
+  document.getElementById("r-big").style.color = tc;
+  if(rn){rn.textContent=nivel; rn.style.background=bg; rn.style.color=tc;}
+  if(rnota){rnota.textContent=nota; rnota.style.background=bg; rnota.style.color=tc; rnota.style.borderColor=tc;}
+}
+
+// ── NPS ────────────────────────────────────────────────────────
+function buildNPS(){
+  var html = "";
+  for(var i=0; i<=10; i++){
+    html += "<button class=\"nps-btn\" type=\"button\" id=\"nps-"+i+"\" onclick=\"setNPS("+i+")\">"+i+"</button>";
+  }
+  document.getElementById("nps-btns").innerHTML = html;
+}
+
+function setNPS(val){
+  npsVal = val;
+  for(var i=0; i<=10; i++){
+    var btn = document.getElementById("nps-"+i);
+    if(!btn) continue;
+    var cls = "nps-btn";
+    if(i===val){
+      if(i<=6) cls += " sel-det";
+      else if(i<=8) cls += " sel-neu";
+      else cls += " sel-pro";
+    }
+    btn.className = cls;
+  }
+  var tipo = val<=6 ? "Detractor 🔴" : val<=8 ? "Neutro 🟡" : "Promotor 🟢";
+  var msg = val<=6 ? "Poco probable que recomiende." : val<=8 ? "Cliente neutro. Susceptible a cambiar." : "Alto promotor. Capital de lealtad.";
+  var bg = val<=6 ? "#fcebeb" : val<=8 ? "#fff3e8" : "#e8f4e8";
+  var res = document.getElementById("nps-result");
+  res.style.display = "block";
+  res.style.background = bg;
+  res.textContent = tipo+" — "+msg;
+}
+
+// ── SAVE ───────────────────────────────────────────────────────
+function saveRecord(){
+  if(!currentStation){ showToast("⚠ Selecciona una estación primero"); return; }
+  var obsMap = {};
+  MOMENTOS.forEach(function(m){
+    var el = document.getElementById("obs-"+m.id);
+    obsMap[m.id] = el ? el.value : "";
+  });
+  var record = {
+    ts: Date.now(),
+    clave: currentStation.clave,
+    name: currentStation.name,
+    tipo: currentStation.tipo,
+    mun: currentStation.mun,
+    addr: currentStation.addr,
+    marca: currentStation.marca,
+    evaluador: document.getElementById("d-eval").value,
+    turno: document.getElementById("d-turno").value,
+    fecha: document.getElementById("d-fecha").value,
+    hora: document.getElementById("d-hora").value,
+    codigo: document.getElementById("d-codigo").value,
+    obs: document.getElementById("d-obs").value,
+    obs_general: document.getElementById("obs-general").value,
+    ev_gopro: document.getElementById("ev-gopro-clips").value,
+    ev_hc_nota: document.getElementById("ev-hc-nota").value,
+    nps: npsVal,
+    t1: getIntervalSecs("m2","m3"),
+    t2: getIntervalSecs("m3","m4"),
+    t3: getIntervalSecs("m4","m5"),
+    t4: getIntervalSecs("m5","m16"),
+    t5: getIntervalSecs("m2","m16"),
+    score: calcTotalScore(),
+    scores: JSON.parse(JSON.stringify(scores)),
+    obs_momentos: obsMap
+  };
+  var stored = [];
+  try { stored = JSON.parse(localStorage.getItem("ciclo_records")||"[]"); } catch(e){}
+  stored.push(record);
+  localStorage.setItem("ciclo_records", JSON.stringify(stored));
+  renderHistory();
+  showToast("✓ Visita guardada — Score "+record.score);
+  goTab(8);
+}
+
+function getIntervalSecs(a,b){
+  if(!tiempos[a] || !tiempos[b]) return "";
+  return Math.round((tiempos[b]-tiempos[a])/1000);
+}
+
+function calcTotalScore(){
+  var total = 0, totMax = 0;
+  MOMENTOS.forEach(function(m){
+    var v = scores[m.id];
+    var w = m.crit==="ALTO" ? 3 : m.crit==="Medio" ? 2 : 1;
+    if(v!==null && v!=="na"){
+      total += v/3*w;
+      totMax += w;
+    } else if(v===null){
+      totMax += w;
+    }
+  });
+  return totMax>0 ? Math.round(total/totMax*100) : 0;
+}
+
+// ── EXPORT CSV ─────────────────────────────────────────────────
+function exportCSV(){
+  var records = [];
+  try { records = JSON.parse(localStorage.getItem("ciclo_records")||"[]"); } catch(e){}
+  if(!records.length){ showToast("Sin registros para exportar"); return; }
+  var mIds = MOMENTOS.map(function(m){return m.id;});
+  var headers = ["Timestamp","Fecha","Hora","Clave","Nombre","Tipo","Marca","Municipio","Direccion",
+    "Evaluador","Turno","Score","NPS","T1_seg","T2_seg","T3_seg","T4_seg","T5_seg",
+    "Codigo_Evidencias","EV_GoPro","EV_HC_Nota"].concat(mIds).concat(mIds.map(function(id){return id+"_obs";})).concat(["Obs_General","Obs_Contexto"]);
+  var rows = records.map(function(r){
+    var base = [new Date(r.ts).toISOString(),r.fecha||"",r.hora||"",r.clave||"",r.name||"",r.tipo||"",r.marca||"",r.mun||"",r.addr||"",
+      r.evaluador||"",r.turno||"",r.score||0,r.nps==null?"":r.nps,r.t1||"",r.t2||"",r.t3||"",r.t4||"",r.t5||"",
+      r.codigo||"",r.ev_gopro||"",r.ev_hc_nota||""];
+    var sc = mIds.map(function(id){return r.scores && r.scores[id]!=null ? r.scores[id] : "";});
+    var ob = mIds.map(function(id){return esc(r.obs_momentos && r.obs_momentos[id] || "");});
+    return base.concat(sc).concat(ob).concat([esc(r.obs_general||""), esc(r.obs||"")]).join(",");
+  });
+  var csv = [headers.join(",")].concat(rows).join("\n");
+  var blob = new Blob(["\uFEFF"+csv], {type:"text/csv;charset=utf-8;"});
+  var a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = "CicloServicio_TE_"+new Date().toISOString().slice(0,10)+".csv";
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  showToast("✓ CSV exportado ("+records.length+" visitas)");
+}
+
+function esc(s){ return "\""+String(s).replace(/"/g,"\"\"")+"\""; }
+
+// ── HISTORIAL ──────────────────────────────────────────────────
+function renderHistory(){
+  var records = [];
+  try { records = JSON.parse(localStorage.getItem("ciclo_records")||"[]"); } catch(e){}
+  document.getElementById("hist-count").textContent = records.length+" visitas";
+  var div = document.getElementById("hist-list");
+  if(!records.length){
+    div.innerHTML = "<div style=\"padding:16px;font-size:13px;color:var(--sub);text-align:center\">Sin registros</div>";
+    return;
+  }
+  var html = "";
+  for(var i=records.length-1; i>=0; i--){
+    var r = records[i];
+    var s = r.score||0;
+    var bg = s>=85?"#e8f4e8":s>=70?"#e8e8ff":s>=55?"#fff3e8":"#fcebeb";
+    var tc = s>=85?"#1f5c1f":s>=70?"#2d2d9e":s>=55?"#904010":"#8a1f1f";
+    var icon = r.tipo==="TE"?"⭐":"🔵";
+    html += "<div class=\"hist-item\">"+
+      "<div>"+icon+"</div>"+
+      "<div class=\"hist-info\">"+
+        "<div class=\"hist-name\">"+escapeHtml(r.clave||"—")+" · "+escapeHtml(r.name||"")+"</div>"+
+        "<div class=\"hist-meta\">"+escapeHtml(r.fecha||"")+" "+escapeHtml(r.hora||"")+" · "+escapeHtml(r.evaluador||"")+"</div>"+
+      "</div>"+
+      "<span class=\"hist-score\" style=\"background:"+bg+";color:"+tc+"\">"+s+"</span>"+
+      "<button class=\"hist-del\" type=\"button\" onclick=\"delRecord("+i+")\">✕</button>"+
+    "</div>";
+  }
+  div.innerHTML = html;
+}
+
+function delRecord(idx){
+  if(!confirm("¿Eliminar este registro?")) return;
+  var records = JSON.parse(localStorage.getItem("ciclo_records")||"[]");
+  records.splice(idx,1);
+  localStorage.setItem("ciclo_records", JSON.stringify(records));
+  renderHistory();
+}
+
+function clearAll(){
+  if(!confirm("¿Eliminar TODOS los registros?")) return;
+  localStorage.removeItem("ciclo_records");
+  renderHistory();
+  showToast("Historial limpiado");
+}
+
+// ── NAV ────────────────────────────────────────────────────────
+function goTab(n){
+  var sections = document.querySelectorAll(".section");
+  var tabs = document.querySelectorAll(".nav-tab");
+  for(var i=0; i<sections.length; i++){
+    sections[i].classList.toggle("active", i===n);
+  }
+  for(var j=0; j<tabs.length; j++){
+    tabs[j].classList.toggle("active", j===n);
+  }
+  if(tabs[n]) tabs[n].scrollIntoView({inline:"center",behavior:"smooth"});
+  if(n===8) recalc();
+  if(n===9) renderHistory();
+}
+
+// ── INIT ───────────────────────────────────────────────────────
+window.addEventListener("load", function(){
+  buildClustersList();
+  buildMomentos();
+  buildNPS();
+  renderHistory();
+  
+  var today = new Date();
+  document.getElementById("d-fecha").value = today.toISOString().slice(0,10);
+  document.getElementById("d-hora").value = today.toTimeString().slice(0,5);
+  
+  // Bind nav tabs
+  var tabs = document.querySelectorAll(".nav-tab");
+  for(var i=0; i<tabs.length; i++){
+    (function(idx){
+      tabs[idx].addEventListener("click", function(){ goTab(idx); });
+    })(i);
+  }
+  
+  // Bind cronómetro buttons
+  ["m2","m3","m4","m5","m16"].forEach(function(k){
+    var btn = document.getElementById("cb-"+k);
+    if(btn) btn.addEventListener("click", function(){ markTime(k); });
+  });
+  document.getElementById("btn-reset-crono").addEventListener("click", resetCrono);
+  
+  // Bind save / export
+  document.getElementById("btn-save").addEventListener("click", saveRecord);
+  document.getElementById("btn-csv-quick").addEventListener("click", exportCSV);
+  document.getElementById("btn-export").addEventListener("click", exportCSV);
+  document.getElementById("btn-clear").addEventListener("click", clearAll);
+  
+  // Bind form changes
+  ["d-fecha","d-turno"].forEach(function(id){
+    var el = document.getElementById(id);
+    if(el) el.addEventListener("change", updateCodigo);
+  });
+  
+  showToast("✓ App lista — toca un cluster para empezar");
+});
+</script>
+</body>
+</html>
