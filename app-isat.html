@@ -228,6 +228,10 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
           <option value="CB-20">CB-20 — Gaso Prod. Periférico Ote.</option>
           <option value="CB-21">CB-21 — Svc. Tenoch Gasomax (VM)</option>
           </optgroup>
+          <optgroup label="Competidor C (tercero en el clúster)">
+          <option value="CC-19">CC-19 — Mobil Combured (Soledad 1)</option>
+          <option value="CC-02">CC-02 — BP Gasolinera Israel 57 (B. Anaya)</option>
+          </optgroup>
         </select>
       </div>
       <div class="meta-field">
@@ -939,10 +943,11 @@ function exportCSV(){
     const base=[new Date(r.ts).toISOString(),r.fecha||'',r.hora||'',r.clave||'',r.nombre||'',r.grupo||'',r.evaluador||'',r.turno||'',r.isat||0,r.t1||0,r.t2||0,r.t3||0,r.t4||0];
     const sVals=allItems.map(id=>r.scores&&r.scores[id]!=null?r.scores[id]:'');
     const bVals=banoIds.map(id=>r.banos&&r.banos[id]!=null?r.banos[id]:'');
-    const extra=[r.video||'',escapeCSV(r.obs_general||''),escapeCSV(r.obs_T1||''),escapeCSV(r.obs_T2||''),escapeCSV(r.obs_banos||''),escapeCSV(r.obs_T3||''),escapeCSV(r.obs_T4||'')];
-    return[...base,...sVals,...bVals,...extra].join(',');
+    const extra=[r.video||'',r.obs_general||'',r.obs_T1||'',r.obs_T2||'',r.obs_banos||'',r.obs_T3||'',r.obs_T4||''];
+    // Se entrecomilla CADA campo una sola vez: evita el corrimiento de columnas.
+    return[...base,...sVals,...bVals,...extra].map(escapeCSV).join(',');
   });
-  const csv=[headers.join(','),...rows].join('\n');
+  const csv=[headers.map(escapeCSV).join(','),...rows].join('\r\n');
   const blob=new Blob(['\uFEFF'+csv],{type:'text/csv;charset=utf-8;'});
   const url=URL.createObjectURL(blob);
   const a=document.createElement('a');

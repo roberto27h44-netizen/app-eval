@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
+<meta name="theme-color" content="#0b0b1a">
+<title>Crono CS</title>
+<style>
+:root{--bg:#0b0b1a;--panel:#15152b;--line:#262647;--txt:#e8e9f5;--sub:#8a8fb5;
+--acc:#4040c0;--acc2:#2d2d9e;--ok:#2e8b57;--warn:#b8860b;--dim:#05050d}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+background:var(--bg);color:var(--txt);font-size:15px;line-height:1.4;padding:10px 10px 24px}
+.hdr{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.hdr h1{font-size:14px;font-weight:700;letter-spacing:.5px;color:var(--sub);text-transform:uppercase}
+.pill{font-size:11px;padding:3px 9px;border-radius:999px;background:var(--panel);color:var(--sub);border:1px solid var(--line)}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:12px;margin-bottom:10px}
+label{display:block;font-size:11px;font-weight:700;color:var(--sub);text-transform:uppercase;margin-bottom:4px}
+select,input{width:100%;padding:11px;border-radius:9px;border:1px solid var(--line);
+background:#0f0f22;color:var(--txt);font-size:15px;font-family:inherit;margin-bottom:9px}
+.code{font-family:ui-monospace,Menlo,monospace;font-size:15px;font-weight:700;letter-spacing:.5px;
+color:#fff;background:#0f0f22;border:1px solid var(--line);border-radius:9px;padding:11px;text-align:center}
+.btn{width:100%;padding:13px;border-radius:10px;border:none;font-size:15px;font-weight:700;
+font-family:inherit;cursor:pointer;background:var(--acc2);color:#fff}
+.btn.ghost{background:transparent;border:1.5px solid var(--line);color:var(--sub)}
+.btn.ok{background:var(--ok)}
+.btn:disabled{opacity:.4}
+/* ---- modo cronómetro ---- */
+#crono{display:none}
+.tapzone{width:100%;height:46vh;min-height:260px;border-radius:16px;border:2px solid var(--acc);
+background:linear-gradient(180deg,#1b1b3a,#111126);color:#fff;font-family:inherit;
+display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;cursor:pointer}
+.tapzone:active{background:#23234d}
+.tapzone .next{font-size:12px;color:var(--sub);text-transform:uppercase;letter-spacing:1px}
+.tapzone .mom{font-size:27px;font-weight:800;text-align:center;padding:0 16px;line-height:1.15}
+.tapzone .hint{font-size:12px;color:var(--sub)}
+.tapzone .elapsed{font-family:ui-monospace,monospace;font-size:34px;font-weight:700;color:#fff}
+.chips{display:grid;grid-template-columns:repeat(5,1fr);gap:5px;margin:9px 0}
+.chip{padding:8px 2px;border-radius:8px;border:1px solid var(--line);background:#0f0f22;
+font-size:10px;font-weight:700;color:var(--sub);text-align:center;cursor:pointer;font-family:inherit}
+.chip.done{background:var(--ok);color:#fff;border-color:var(--ok)}
+.rowbtn{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+table{width:100%;border-collapse:collapse;font-size:13px}
+td{padding:6px 0;border-bottom:1px solid var(--line)}
+td:last-child{text-align:right;font-family:ui-monospace,monospace;font-weight:700}
+.tot td{border-bottom:none;font-weight:800;color:#fff}
+.warnbox{background:#2a2410;border:1px solid var(--warn);color:#f0d48a;border-radius:9px;
+padding:9px;font-size:12px;margin-bottom:9px}
+.saved{font-size:12px;color:var(--sub)}
+/* ---- pantalla negra de discreción ---- */
+#blackout{display:none;position:fixed;inset:0;background:var(--dim);z-index:999}
+#blackout .bzone{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+color:#141427;font-size:12px;letter-spacing:2px}
+</style>
+</head>
+<body>
+
+<div class="hdr">
+  <h1>Crono · Ciclo de Servicio</h1>
+  <span class="pill" id="count">0 guardados</span>
+</div>
+
+<!-- ============ PASO 1: ARMAR (antes de entrar a la estación) ============ -->
+<div id="setup">
+  <div class="card">
+    <label>Estación a evaluar</label>
+    <select id="clave"><option value="TE-01">TE-01 · Alamitos</option>
+<option value="CB-01">CB-01 · SERVICIO TATANACHO</option>
+<option value="CA-01">CA-01 · GAZPRO</option>
+<option value="TE-02">TE-02 · B. Anaya</option>
+<option value="CB-02">CB-02 · GAZPRO</option>
+<option value="CA-02">CA-02 · SÚPER SERVICIO ABASTOS</option>
+<option value="CC-02">CC-02 · BP Gasolinera Israel 57 (B. Anaya)</option>
+<option value="TE-03">TE-03 · Central</option>
+<option value="CB-03">CB-03 · SERVICIO ESMERALDA</option>
+<option value="CA-03">CA-03 · HIDROSINA PLUS</option>
+<option value="TE-04">TE-04 · Chapultepec</option>
+<option value="CB-04">CB-04 · COSTCO GAS,  (E.S. Costco)</option>
+<option value="CA-04">CA-04 · CORPOE,  (E.S. Mobil Lomas)</option>
+<option value="TE-05">TE-05 · Ducati</option>
+<option value="CB-05">CB-05 · JESÚS MANUEL TENOCH GONZÁLEZ MARTI</option>
+<option value="CA-05">CA-05 · CORPOE</option>
+<option value="TE-06">TE-06 · Glorieta</option>
+<option value="CB-06">CB-06 · SERVICIO VALENTIN AMADOR</option>
+<option value="CA-06">CA-06 · SERVICIO RELAMPAGO</option>
+<option value="TE-07">TE-07 · Himno</option>
+<option value="CB-07">CB-07 · SÚPER SERVICIO CLOUTHIER</option>
+<option value="CA-07">CA-07 · SERVICIO TATANACHO</option>
+<option value="TE-08">TE-08 · La Feria</option>
+<option value="CB-08">CB-08 · GASOLINERA PERISUR</option>
+<option value="CA-08">CA-08 · GASOLINERAS ASOCIADAS POTOSINAS</option>
+<option value="TE-09">TE-09 · Las Lomas</option>
+<option value="CB-09">CB-09 · SERVICIO SIERRA VISTA</option>
+<option value="CA-09">CA-09 · ULTRA SERVICIO LOMAS</option>
+<option value="TE-10">TE-10 · Los Globos</option>
+<option value="CB-10">CB-10 · GAZPRO</option>
+<option value="CA-10">CA-10 · SERVICIO ACCESO NORTE</option>
+<option value="TE-11">TE-11 · Morales</option>
+<option value="CB-11">CB-11 · SÚPER ESTACIÓN DE ALBA</option>
+<option value="CA-11">CA-11 · CORPOE</option>
+<option value="TE-12">TE-12 · Polanco</option>
+<option value="CB-12">CB-12 · GASOLINERA DORADO</option>
+<option value="CA-12">CA-12 · CORPOE</option>
+<option value="TE-13">TE-13 · Pozos A</option>
+<option value="CB-13">CB-13 · MULTISERVICIOS TULA 2000</option>
+<option value="CA-13">CA-13 · COMSERPO</option>
+<option value="TE-14">TE-14 · Pozos B</option>
+<option value="CB-14">CB-14 · MULTISERVICIOS TULA 2000</option>
+<option value="CA-14">CA-14 · COMSERPO</option>
+<option value="TE-15">TE-15 · Reforma</option>
+<option value="CB-15">CB-15 · ULTRA SERVICIO ALAMEDA</option>
+<option value="CA-15">CA-15 · GAZPRO</option>
+<option value="TE-16">TE-16 · Salk 1</option>
+<option value="CB-16">CB-16 · HIDROSINA PLUS</option>
+<option value="CA-16">CA-16 · Futurgas</option>
+<option value="TE-17">TE-17 · Salk 2</option>
+<option value="CB-17">CB-17 · EXPRESS GAS</option>
+<option value="CA-17">CA-17 · GASOLINERA PERISUR</option>
+<option value="TE-18">TE-18 · Satélite</option>
+<option value="CB-18">CB-18 · Operadora de Franquicias Dineek</option>
+<option value="CA-18">CA-18 · MARCO ANTONIO FONSECA MARQUEZ</option>
+<option value="TE-19">TE-19 · Soledad 1</option>
+<option value="CB-19">CB-19 · EXPRESS PERICO</option>
+<option value="CA-19">CA-19 · AGENCIA DE COMB. Y LUB EL MORRO</option>
+<option value="CC-19">CC-19 · Mobil Combured (Soledad 1)</option>
+<option value="TE-20">TE-20 · Soledad 2</option>
+<option value="CB-20">CB-20 · GASO PRODUCTOS PERIFÉRICO ORIENTE</option>
+<option value="CA-20">CA-20 · SUANA</option>
+<option value="TE-21">TE-21 · Villa Magna</option>
+<option value="CB-21">CB-21 · JESÚS MANUEL TENOCH GONZÁLEZ MARTI</option>
+<option value="CA-21">CA-21 · CORPOE</option></select>
+    <label>Turno</label>
+    <select id="turno">
+      <option value="M">Mañana</option>
+      <option value="T" selected>Tarde</option>
+      <option value="N">Noche</option>
+    </select>
+    <label>Evaluador</label>
+    <select id="evaluador">
+      <option>JFG — Coordinador</option>
+      <option>Evaluador A</option>
+      <option>Evaluador B</option>
+    </select>
+    <label>Código de Evidencias (automático)</label>
+    <div class="code" id="codigo">—</div>
+  </div>
+  <button class="btn" id="btn-armar">Armar cronómetro</button>
+  <p class="saved" style="margin-top:9px">Arma el cronómetro <b>antes</b> de entrar a la estación. Una vez armado, solo se toca la pantalla grande.</p>
+</div>
+
+<!-- ============ PASO 2: CRONÓMETRO ============ -->
+<div id="crono">
+  <div class="card" style="padding:9px 12px">
+    <div style="display:flex;justify-content:space-between;align-items:center">
+      <span style="font-family:ui-monospace,monospace;font-weight:700;font-size:13px" id="c-code">—</span>
+      <span class="pill" id="c-step">0 / 5</span>
+    </div>
+  </div>
+
+  <button class="tapzone" id="tap">
+    <span class="next">Siguiente marca</span>
+    <span class="mom" id="t-mom">Ingreso al predio</span>
+    <span class="elapsed" id="t-elapsed">0:00</span>
+    <span class="hint" id="t-hint">Toca al cruzar la entrada</span>
+  </button>
+
+  <div class="chips" id="chips"></div>
+
+  <div class="rowbtn" style="margin-bottom:9px">
+    <button class="btn ghost" id="btn-undo">Deshacer</button>
+    <button class="btn ghost" id="btn-black">Pantalla negra</button>
+  </div>
+
+  <div class="card">
+    <table>
+      <tr><td>T1 Espera vialidad (M2→M3)</td><td id="v1">—</td></tr>
+      <tr><td>T2 Fila (M3→M4)</td><td id="v2">—</td></tr>
+      <tr><td>T3 Reacción (M4→M5)</td><td id="v3">—</td></tr>
+      <tr><td>T4 Despacho (M5→M16)</td><td id="v4">—</td></tr>
+      <tr class="tot"><td>T5 Ciclo total</td><td id="v5">—</td></tr>
+    </table>
+  </div>
+
+  <div id="plaus"></div>
+  <button class="btn ok" id="btn-save" disabled>Guardar visita</button>
+  <button class="btn ghost" id="btn-cancel" style="margin-top:8px">Cancelar</button>
+</div>
+
+<!-- ============ EXPORTAR ============ -->
+<div class="card" style="margin-top:14px">
+  <label>Respaldo</label>
+  <button class="btn ghost" id="btn-export">Exportar CSV de tiempos</button>
+  <p class="saved" style="margin-top:8px">Expórtalo al terminar <b>cada jornada</b> y súbelo a Drive. Es el único respaldo.</p>
+</div>
+
+<div id="blackout"><div class="bzone" id="bzone">toca para marcar</div></div>
+
+<script>
+/* ===== Secuencia de momentos: empata con T1..T5 del instrumento ===== */
+var SEQ = [
+  {k:"m2",  mom:"Ingreso al predio",        hint:"Toca al cruzar la entrada"},
+  {k:"m3",  mom:"Fin de espera en vialidad",hint:"Toca al liberarse el paso hacia la isla"},
+  {k:"m4",  mom:"Frente al surtidor",       hint:"Toca al quedar detenido en posición"},
+  {k:"m5",  mom:"Primer contacto",          hint:"Toca cuando el despachador te habla"},
+  {k:"m16", mom:"Despedida",                hint:"Toca al cerrar el servicio"}
+];
+var CHIP = ["M2","M3","M4","M5","M16"];
+var KEY = "crono_records";
+
+var marks = {}, step = 0, armed = null, tick = null;
+
+function $(id){ return document.getElementById(id); }
+function two(n){ return (n<10?"0":"")+n; }
+function fmt(s){ if(s===null||s===undefined||s==="") return "—"; return Math.floor(s/60)+":"+two(s%60); }
+function load(){ try{ return JSON.parse(localStorage.getItem(KEY)||"[]"); }catch(e){ return []; } }
+function save(a){ try{ localStorage.setItem(KEY, JSON.stringify(a)); }catch(e){ alert("No se pudo guardar: almacenamiento lleno o bloqueado."); } }
+function refreshCount(){ $("count").textContent = load().length + " guardados"; }
+
+/* ---- Código de Evidencias: CLAVE_AAAAMMDD_T (igual que app-cs) ---- */
+function buildCode(){
+  var d = new Date();
+  var f = d.getFullYear()+two(d.getMonth()+1)+two(d.getDate());
+  return $("clave").value + "_" + f + "_" + $("turno").value;
+}
+function updCode(){ $("codigo").textContent = buildCode(); }
+$("clave").addEventListener("change", updCode);
+$("turno").addEventListener("change", updCode);
+updCode();
+
+/* ---- Armar ---- */
+$("btn-armar").addEventListener("click", function(){
+  armed = {
+    clave: $("clave").value,
+    label: $("clave").options[$("clave").selectedIndex].text,
+    turno: $("turno").value,
+    evaluador: $("evaluador").value,
+    codigo: buildCode()
+  };
+  marks = {}; step = 0;
+  $("setup").style.display = "none";
+  $("crono").style.display = "block";
+  $("c-code").textContent = armed.codigo;
+  renderChips(); render();
+});
+
+function renderChips(){
+  var h = "";
+  for(var i=0;i<SEQ.length;i++){
+    h += '<div class="chip'+(marks[SEQ[i].k]?' done':'')+'" data-i="'+i+'">'+CHIP[i]+'</div>';
+  }
+  $("chips").innerHTML = h;
+  var cs = $("chips").getElementsByClassName("chip");
+  for(var j=0;j<cs.length;j++){
+    cs[j].addEventListener("click", function(){
+      var i = parseInt(this.getAttribute("data-i"),10);
+      marks[SEQ[i].k] = Date.now();
+      step = 0; for(var q=0;q<SEQ.length;q++){ if(marks[SEQ[q].k]) step = q+1; }
+      renderChips(); render();
+    });
+  }
+}
+
+function diff(a,b){ if(!marks[a]||!marks[b]) return ""; return Math.round((marks[b]-marks[a])/1000); }
+
+function render(){
+  $("c-step").textContent = Object.keys(marks).length + " / 5";
+  if(step < SEQ.length){
+    $("t-mom").textContent  = SEQ[step].mom;
+    $("t-hint").textContent = SEQ[step].hint;
+  } else {
+    $("t-mom").textContent  = "Servicio completo";
+    $("t-hint").textContent = "Guarda la visita";
+  }
+  var t = [diff("m2","m3"),diff("m3","m4"),diff("m4","m5"),diff("m5","m16"),diff("m2","m16")];
+  for(var i=0;i<5;i++){ $("v"+(i+1)).textContent = fmt(t[i]); }
+  $("btn-save").disabled = !marks.m2 || !marks.m16;
+
+  /* aviso de plausibilidad: evita guardar tiempos de toques en ráfaga */
+  var w = "";
+  if(marks.m2 && marks.m16){
+    var tot = t[4], rafaga = 0;
+    for(var k=0;k<4;k++){ if(t[k]!=="" && t[k] <= 2) rafaga++; }
+    if(tot < 180) w = "El ciclo total es menor a 3 minutos. Verifica que marcaste en tiempo real y no al final.";
+    else if(t[3] !== "" && t[3] < 60) w = "El despacho duró menos de 1 minuto. Revisa la marca de Primer contacto o Despedida.";
+    else if(rafaga >= 2) w = "Hay 2 o más intervalos de 2 segundos o menos: parece que las marcas se tocaron en ráfaga.";
+  }
+  $("plaus").innerHTML = w ? '<div class="warnbox">'+w+'</div>' : "";
+
+  if(!tick){ tick = setInterval(elapsed, 1000); }
+  elapsed();
+}
+
+function elapsed(){
+  if(!marks.m2){ $("t-elapsed").textContent = "0:00"; return; }
+  var end = marks.m16 || Date.now();
+  $("t-elapsed").textContent = fmt(Math.round((end - marks.m2)/1000));
+}
+
+/* ---- Un solo toque grande: avanza la secuencia ---- */
+function doTap(){
+  if(step >= SEQ.length) return;
+  marks[SEQ[step].k] = Date.now();
+  step++;
+  renderChips(); render();
+  if(navigator.vibrate){ navigator.vibrate(35); }
+}
+$("tap").addEventListener("click", doTap);
+
+$("btn-undo").addEventListener("click", function(){
+  if(step <= 0) return;
+  step--; delete marks[SEQ[step].k];
+  renderChips(); render();
+});
+
+/* ---- Pantalla negra: sigue marcando sin exponer la app ---- */
+$("btn-black").addEventListener("click", function(){ $("blackout").style.display = "block"; });
+$("bzone").addEventListener("click", function(e){ e.stopPropagation(); doTap(); });
+$("blackout").addEventListener("dblclick", function(){ $("blackout").style.display = "none"; });
+
+/* ---- Guardar ---- */
+$("btn-save").addEventListener("click", function(){
+  var rec = {
+    ts: Date.now(), clave: armed.clave, label: armed.label, turno: armed.turno,
+    evaluador: armed.evaluador, codigo: armed.codigo,
+    m2: marks.m2||null, m3: marks.m3||null, m4: marks.m4||null,
+    m5: marks.m5||null, m16: marks.m16||null,
+    t1: diff("m2","m3"), t2: diff("m3","m4"), t3: diff("m4","m5"),
+    t4: diff("m5","m16"), t5: diff("m2","m16")
+  };
+  var a = load(); a.push(rec); save(a);
+  if(tick){ clearInterval(tick); tick = null; }
+  armed = null; marks = {}; step = 0;
+  $("crono").style.display = "none";
+  $("setup").style.display = "block";
+  refreshCount();
+  alert("Visita guardada: " + rec.codigo + "\nCiclo total " + fmt(rec.t5));
+});
+
+$("btn-cancel").addEventListener("click", function(){
+  if(!confirm("¿Descartar las marcas de esta visita?")) return;
+  if(tick){ clearInterval(tick); tick = null; }
+  armed = null; marks = {}; step = 0;
+  $("crono").style.display = "none";
+  $("setup").style.display = "block";
+});
+
+/* ---- Exportar CSV (campos entrecomillados: evita el corrimiento de columnas) ---- */
+function q(v){
+  if(v === null || v === undefined) v = "";
+  return '"' + String(v).replace(/"/g,'""') + '"';
+}
+function iso(ms){ return ms ? new Date(ms).toISOString() : ""; }
+$("btn-export").addEventListener("click", function(){
+  var a = load();
+  if(!a.length){ alert("No hay visitas guardadas todavía."); return; }
+  var head = ["Timestamp","Fecha","Hora","Clave","Estacion","Turno","Evaluador","Codigo_Evidencias",
+              "Marca_M2","Marca_M3","Marca_M4","Marca_M5","Marca_M16",
+              "T1_seg","T2_seg","T3_seg","T4_seg","T5_seg"];
+  var lines = [head.map(q).join(",")];
+  for(var i=0;i<a.length;i++){
+    var r = a[i], d = new Date(r.ts);
+    lines.push([
+      iso(r.ts),
+      d.getFullYear()+"-"+two(d.getMonth()+1)+"-"+two(d.getDate()),
+      two(d.getHours())+":"+two(d.getMinutes()),
+      r.clave, r.label, r.turno, r.evaluador, r.codigo,
+      iso(r.m2), iso(r.m3), iso(r.m4), iso(r.m5), iso(r.m16),
+      r.t1, r.t2, r.t3, r.t4, r.t5
+    ].map(q).join(","));
+  }
+  var blob = new Blob(["\ufeff" + lines.join("\r\n")], {type:"text/csv;charset=utf-8;"});
+  var d2 = new Date();
+  var name = "CRONO_" + d2.getFullYear()+two(d2.getMonth()+1)+two(d2.getDate()) + ".csv";
+  var url = URL.createObjectURL(blob);
+  var link = document.createElement("a");
+  link.href = url; link.download = name;
+  document.body.appendChild(link); link.click();
+  document.body.removeChild(link);
+  setTimeout(function(){ URL.revokeObjectURL(url); }, 1500);
+});
+
+refreshCount();
+</script>
+</body>
+</html>
